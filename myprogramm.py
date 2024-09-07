@@ -1,1665 +1,626 @@
-from tkinter import *
-from tkinter import messagebox
-
-import linecache
+import tkinter as tk
+from tkinter import ttk, messagebox, filedialog
+import logging
+import json
 import re
-root = Tk()
-root.title("CE Configurator")
-root.geometry("500x500")
-
-
-
-
-
-generallabel = Label(root, text="I want to change")
-generallabel.grid(row=1,column=1)
-
-global difficulty
-difficulty = StringVar(value="normal")
-performance =Radiobutton(root, text="performance(easy)", variable=difficulty,value="performance").grid(row=5,column=2)
-normal = Radiobutton(root, text="normal", variable=difficulty,value="normal").grid(row=2,column=2)
-hard = Radiobutton(root, text="hard", variable=difficulty,value="hard").grid(row=3,column=2)
-unfair = Radiobutton(root, text="unfair", variable=difficulty,value="unfair").grid(row=4,column=2)
-
-choosedifficulty =Label(root, text="Choose your difficulty before changing anything").grid(row=1,column=2)
-
-
-def aiArmySize():
-    aiSizeWindow = Toplevel(root)
-
-    aiSizeWindow.title("AI army size")
-    aiSizeWindow.geometry('700x150')
-    aiSizeCurrent = ""
-    if difficulty.get() == "performance":
-         fileToRead = "./resource/set/dynamic_campaign/dcg_easy.inc"
-         with open(fileToRead, "r") as lengthFile:
-             wholeFile = lengthFile.read()
-             #currentLength = linecache.getline(r"./resource/set/dynamic_campaign/dcg_easy.inc", 37)
-             currentLength2 = r"BotResources +\d+"
-             currentLength3 = str(re.search(currentLength2, wholeFile).group())
-             currentLength4 = currentLength3.strip("[']")
-             currentLength5 = currentLength4.replace("BotResources","").strip()
-
-
-             print(currentLength3)
-
-    elif difficulty.get() == "hard":
-        fileToRead = "./resource/set/dynamic_campaign/dcg_hard.inc"
-        with open(fileToRead, "r") as lengthFile:
-            wholeFile = lengthFile.read()
-            # currentLength = linecache.getline(r"./resource/set/dynamic_campaign/dcg_easy.inc", 37)
-            currentLength2 = r"BotResources +\d+"
-            currentLength3 = str(re.search(currentLength2, wholeFile).group())
-            currentLength4 = currentLength3.strip("[']")
-            currentLength5 = currentLength4.replace("BotResources", "").strip()
-
-    elif difficulty.get() == "normal":
-        fileToRead = "./resource/set/dynamic_campaign/dcg_normal.inc"
-        with open(fileToRead, "r") as lengthFile:
-            wholeFile = lengthFile.read()
-            # currentLength = linecache.getline(r"./resource/set/dynamic_campaign/dcg_easy.inc", 37)
-            currentLength2 = r"BotResources +\d+"
-            currentLength3 = str(re.search(currentLength2, wholeFile).group())
-            currentLength4 = currentLength3.strip("[']")
-            currentLength5 = currentLength4.replace("BotResources", "").strip()
-
-
-
-    elif difficulty.get() == "unfair":
-        fileToRead = "./resource/set/dynamic_campaign/dcg_heroic.inc"
-        with open(fileToRead, "r") as lengthFile:
-            wholeFile = lengthFile.read()
-            # currentLength = linecache.getline(r"./resource/set/dynamic_campaign/dcg_easy.inc", 37)
-            currentLength2 = r"BotResources +\d+"
-            currentLength3 = str(re.search(currentLength2, wholeFile).group())
-            currentLength4 = currentLength3.strip("[']")
-            currentLength5 = currentLength4.replace("BotResources", "").strip()
-
-    def savechanges():
-         with open(fileToRead, "w") as lengthFile:
-              newPoints = int(str(currentPoints.get()))
-              lengthFile.write(wholeFile.replace(currentLength4, str(f"BotResources {newPoints}")))
-              messagebox.showinfo("Saved")
-
-              aiSizeWindow.destroy()
-
-
-    currentPoints = Entry(aiSizeWindow, textvariable=aiSizeCurrent, width=15)
-    currentPoints.delete(0, END)
-    currentPoints.insert(0, currentLength5)
-    currentPoints.grid(row=2, column=2)
-
-    saveButton = Button(aiSizeWindow, text="Save changes", command=savechanges)
-    saveButton.grid(row=3, column=2, padx=3)
-
-    aiSizeWindow = Label(aiSizeWindow,text=f"Current AI army size multiplier is {currentLength5}. Normally it's between 6 and 7").grid(row=1, column=2)
-
-aiarmy = Button(root, text="AI army size", command=aiArmySize)
-aiarmy.grid(row=13,column=1)
-
-def playerArmySize():
-    playerSizeWindow = Toplevel(root)
-
-    playerSizeWindow.title("AI army size")
-    playerSizeWindow.geometry('700x150')
-    playerSizeCurrent = ""
-
-    eachStageSize = StringVar()
-    wholeBudget = StringVar()
-
-    if difficulty.get() == "performance":
-        fileToRead = "./resource/set/dynamic_campaign/dcg_easy.inc"
-        with open(fileToRead, "r") as lengthFile:
-            wholeFile = lengthFile.read()
-            currentLength = linecache.getline(r"./resource/set/dynamic_campaign/dcg_easy.inc", 3)
-            #currentLength2 = r"StageCP +\d+"
-            #currentLength3 = str(re.search(currentLength2, currentLength).group())
-          #  currentLength4 = currentLength3.lstrip
-            currentLength5 = currentLength.replace("	{StageCP ", "").strip()
-            currentLength6 = currentLength5.replace("}", "").strip()
-            eachStageSize.set(currentLength6)
-
-            # print(wholeFile)
-
-            currentLength1 = linecache.getline(r"./resource/set/dynamic_campaign/dcg_easy.inc", 94)
-            currentLength22 = r"[\d]+\d"
-            currentLength33 = str(re.search(currentLength22, currentLength1).group())
-            currentLength44 = currentLength33.strip("[']")
-            currentLength55 = currentLength1.replace('				{Start "', '').strip()
-            currentLength66 = currentLength55.replace('"', '').strip()
-            wholeBudget.set(currentLength55)
-
-            #print(currentLength3)
-
-    elif difficulty.get() == "hard":
-        fileToRead = "./resource/set/dynamic_campaign/dcg_hard.inc"
-        with open(fileToRead, "r") as lengthFile:
-            wholeFile = lengthFile.read()
-            currentLength = linecache.getline(r"./resource/set/dynamic_campaign/dcg_hard.inc", 3)
-            # currentLength2 = r"StageCP +\d+"
-            # currentLength3 = str(re.search(currentLength2, currentLength).group())
-            #  currentLength4 = currentLength3.lstrip
-            currentLength5 = currentLength.replace("	{StageCP ", "").strip()
-            currentLength6 = currentLength5.replace("}", "").strip()
-            eachStageSize.set(currentLength6)
-
-            # print(wholeFile)
-
-            currentLength1 = linecache.getline(r"./resource/set/dynamic_campaign/dcg_hard.inc", 94)
-            currentLength22 = r"[\d]+\d"
-            currentLength33 = str(re.search(currentLength22, currentLength1).group())
-            currentLength44 = currentLength33.strip("[']")
-            currentLength55 = currentLength1.replace('				{Start "', '').strip()
-            currentLength66 = currentLength55.replace('"', '').strip()
-            wholeBudget.set(currentLength55)
-
-    elif difficulty.get() == "normal":
-        fileToRead = "./resource/set/dynamic_campaign/dcg_normal.inc"
-        with open(fileToRead, "r") as lengthFile:
-            wholeFile = lengthFile.read()
-            currentLength = linecache.getline(r"./resource/set/dynamic_campaign/dcg_normal.inc", 3)
-            # currentLength2 = r"StageCP +\d+"
-            # currentLength3 = str(re.search(currentLength2, currentLength).group())
-            #  currentLength4 = currentLength3.lstrip
-            currentLength5 = currentLength.replace("	{StageCP ", "").strip()
-            currentLength6 = currentLength5.replace("}", "").strip()
-            eachStageSize.set(currentLength6)
-
-            # print(wholeFile)
-
-            currentLength1 = linecache.getline(r"./resource/set/dynamic_campaign/dcg_normal.inc", 94)
-            currentLength22 = r"[\d]+\d"
-            currentLength33 = str(re.search(currentLength22, currentLength1).group())
-            currentLength44 = currentLength33.strip("[']")
-            currentLength55 = currentLength1.replace('				{Start "', '').strip()
-            currentLength66 = currentLength55.replace('"', '').strip()
-            wholeBudget.set(currentLength55)
-
-
-
-    elif difficulty.get() == "unfair":
-        fileToRead = "./resource/set/dynamic_campaign/dcg_heroic.inc"
-        with open(fileToRead, "r") as lengthFile:
-            wholeFile = lengthFile.read()
-            currentLength = linecache.getline(r"./resource/set/dynamic_campaign/dcg_heroic.inc", 3)
-            # currentLength2 = r"StageCP +\d+"
-            # currentLength3 = str(re.search(currentLength2, currentLength).group())
-            #  currentLength4 = currentLength3.lstrip
-            currentLength5 = currentLength.replace("	{StageCP ", "").strip()
-            currentLength6 = currentLength5.replace("}", "").strip()
-            eachStageSize.set(currentLength6)
-
-            # print(wholeFile)
-
-            currentLength1 = linecache.getline(r"./resource/set/dynamic_campaign/dcg_heroic.inc", 94)
-            currentLength22 = r"[\d]+\d"
-            currentLength33 = str(re.search(currentLength22, currentLength1).group())
-            currentLength44 = currentLength33.strip("[']")
-            currentLength55 = currentLength1.replace('				{Start "', '').strip()
-            currentLength66 = currentLength55.replace('"', '').strip()
-            wholeBudget.set(currentLength55)
-
-    def savechanges():
-        with open(fileToRead, "w") as lengthFile:
-
-            newPoints2 = str(eachStageSize.get())
-            newPoints3 = str(wholeBudget.get())
-
-
-
-            newf = (wholeFile.replace(currentLength, str(f"	{{StageCP {newPoints2} }} \n")))
-            newf2 = (newf.replace(currentLength1, str(f'				{{Start "0:{newPoints3}"}}\n')))
-
-            lengthFile.write(newf2)
-            messagebox.showinfo("Saved")
-            playerSizeWindow.destroy()
-
-    currentPoints = Entry(playerSizeWindow, textvariable=eachStageSize, width=50)
-    currentPoints.delete(0, END)
-    currentPoints.insert(0, currentLength6)
-    currentPoints.grid(row=2, column=1)
-
-    currentBudget = Entry(playerSizeWindow, textvariable=wholeBudget, width=50)
-    currentBudget.delete(0, END)
-    currentBudget.insert(0, currentLength33)
-    currentBudget.grid(row=4, column=1)
-
-    saveButton = Button(playerSizeWindow, text="Save changes", command=savechanges)
-    saveButton.grid(row=4, column=1, padx=3)
-
-    playerLabel = Label(playerSizeWindow, text=f"Size of each stage. keep the space between each number and it should be 7 numbers").grid(row=1,column=1)
-    playerLabel2 = Label(playerSizeWindow, text=f"How much points you have in the battle to buy these stages(in mod you're supposed to only have enough for 5)").grid(row=3, column=1)
-
-
-playerarmy = Button(root, text="Player army size", command=playerArmySize)
-playerarmy.grid(row=3,column=1)
-
-def preparationTime():
-    preparationWindow = Toplevel(root)
-
-    preparationWindow.title("Time before AI arrives")
-    preparationWindow.geometry('800x250')
-
-    preparationTime1 = StringVar()
-    preparationTime2 = StringVar()
-    preparationTime3 = StringVar()
-    preparationTime4 = StringVar()
-    preparationTime5 = StringVar()
-
-    fileToRead = "./resource/conquest_configuration/bot.conquest_configuration.lua"
-    with open(fileToRead, "r") as lengthFile:
-        wholeFile = lengthFile.read()
-        currentLength = linecache.getline(r"./resource/conquest_configuration/bot.conquest_configuration.lua", 16)
-       # currentLength2 = r"StartVal +\d+"
-       # currentLength3 = str(re.search(currentLength2, currentLength).group())
-      #  currentLength4 = currentLength3.strip("[']")
-        currentLength5 = currentLength.replace("	oneFlagOffsetTime = ", "").strip()
-        preparationTime1.set(currentLength5)
-
-        # print(wholeFile)
-
-        currentLength1 = linecache.getline(r"./resource/conquest_configuration/bot.conquest_configuration.lua", 23)
-       # currentLength22 = r"StartVal +\d+"
-       # currentLength33 = str(re.search(currentLength22, currentLength1).group())
-       # currentLength44 = currentLength33.strip("[']")
-        currentLength55 = currentLength1.replace("	twoFlagOffsetTime = ", "").strip()
-        preparationTime2.set(currentLength55)
-
-        currentLength11 = linecache.getline(r"./resource/conquest_configuration/bot.conquest_configuration.lua", 19)
-       # currentLength222 = r"StartVal +\d+"
-       # currentLength333 = str(re.search(currentLength222, currentLength11).group())
-       # currentLength444 = currentLength333.strip("[']")
-        currentLength555 = currentLength11.replace("	threeFlagOffsetTime = ", "").strip()
-        preparationTime3.set(currentLength555)
-
-        currentLength111 = linecache.getline(r"./resource/conquest_configuration/bot.conquest_configuration.lua", 20)
-       # currentLength2222 = r"StartVal +\d+"
-        #currentLength3333 = str(re.search(currentLength2222, currentLength111).group())
-       # currentLength4444 = currentLength3333.strip("[']")
-        currentLength5555 = currentLength111.replace("	fourFlagOffsetTime = ", "").strip()
-        preparationTime4.set(currentLength5555)
-
-        currentLength1111 = linecache.getline(r"./resource/conquest_configuration/bot.conquest_configuration.lua", 24)
-       # currentLength22222 = r"StartVal +\d+"
-       # currentLength33333 = str(re.search(currentLength22222, currentLength1111).group())
-      #  currentLength44444 = currentLength33333.strip("[']")
-        currentLength55555 = currentLength1111.replace("	fiveFlagOffsetTime = ", "").strip()
-        preparationTime5.set(currentLength55555)
-
-        def savechanges():
-            with open(fileToRead, "w") as lengthFile:
-                newPoints2 = str(preparationTime1.get())
-                newPoints3 = str(preparationTime2.get())
-                newPoints4 = str(preparationTime3.get())
-                newPoints5 = str(preparationTime4.get())
-                newPoints6 = str(preparationTime5.get())
-
-                newf = (wholeFile.replace(currentLength, str(f"	oneFlagOffsetTime = {newPoints2} \n")))
-                newf2 = (newf.replace(currentLength1, str(f"	twoFlagOffsetTime = {newPoints3} \n")))
-                newf3 = (newf2.replace(currentLength11, str(f"	threeFlagOffsetTime = {newPoints4} \n")))
-                newf4 = (newf3.replace(currentLength111, str(f"	fourFlagOffsetTime = {newPoints5} \n")))
-                newf5 = (newf4.replace(currentLength1111, str(f"	fiveFlagOffsetTime = {newPoints6} \n")))
-
-                lengthFile.write(newf5)
-                messagebox.showinfo("Saved")
-                # lengthFile.write(wholeFile.replace(currentLength44, str(f"StartVal {newPoints3}")))
-                #  lengthFile.write(wholeFile.replace(currentLength444, str(f"StartVal {newPoints4}")))
-                #  lengthFile.write(wholeFile.replace(currentLength4444, str(f"StartVal {newPoints5}")))
-                preparationWindow.destroy()
-
-    preparationTimesspin1 = Spinbox(preparationWindow, from_=1.0, to=10000.0, textvariable=preparationTime1).grid(row=2, column=1)
-    preparationTimesspin2 = Spinbox(preparationWindow, from_=1.0, to=10000.0, textvariable=preparationTime2).grid(row=4, column=1)
-    preparationTimesspin3 = Spinbox(preparationWindow, from_=1.0, to=10000.0, textvariable=preparationTime3).grid(row=6, column=1)
-    preparationTimesspin4 = Spinbox(preparationWindow, from_=1.0, to=10000.0, textvariable=preparationTime4).grid(row=8, column=1)
-    preparationTimesspin5 = Spinbox(preparationWindow, from_=1.0, to=10000.0, textvariable=preparationTime5).grid(row=10,column=1)
-
-
-    preparationTimeslabel = Label(preparationWindow, text="Time in seconds before AI comes in 1 flag missions (early defenses)").grid(row=1, column=1)
-    preparationTimeslabel = Label(preparationWindow, text="Time in seconds before AI comes in 2 flag missions (mid defenses)").grid(row=3,column=1)
-    preparationTimeslabel = Label(preparationWindow, text="Time in seconds before AI comes in 3 flag missions (mid attacks)").grid(row=5,column=1)
-    preparationTimeslabel = Label(preparationWindow, text="Time in seconds before AI comes in 4 flag missions (late attacks)").grid(row=7,column=1)
-    preparationTimeslabel = Label(preparationWindow, text="Time in seconds before AI comes in 2 flag missions (late defenses)").grid(row=9,column=1)
-
-    saveButton = Button(preparationWindow, text="Save changes", command=savechanges)
-    saveButton.grid(row=6, column=3, padx=3)
-
-
-preparation = Button(root, text="Preparation time", command=preparationTime)
-preparation.grid(row=4,column=1)
-
-def resourceStarting():
-    resourceStartingWindow = Toplevel(root)
-
-    resourceStartingWindow.title("Resources at the start of campaign")
-    resourceStartingWindow.geometry('300x250')
-
-    researchPoints = StringVar()
-    manPowerPoints = StringVar()
-    starCallPoints = StringVar()
-    ammoPoints = StringVar()
-
-    researchPointsspin = Spinbox(resourceStartingWindow, from_=1.0, to=10000.0, textvariable=researchPoints).grid(row=1, column=1)
-    manPowerPointspin = Spinbox(resourceStartingWindow, from_=1.0, to=100000.0, textvariable=manPowerPoints).grid(row=2, column=1)
-    starCallPointsspin = Spinbox(resourceStartingWindow, from_=1.0, to=10000.0, textvariable=starCallPoints).grid(row=3, column=1)
-    ammoPointsspin = Spinbox(resourceStartingWindow, from_=1.0, to=10000.0, textvariable=ammoPoints).grid(row=4, column=1)
-
-
-    if difficulty.get() == "performance":
-        fileToRead = "./resource/set/dynamic_campaign/dcg_easy.inc"
-        with open(fileToRead, "r") as lengthFile:
-            wholeFile = lengthFile.read()
-            currentLength = linecache.getline(r"./resource/set/dynamic_campaign/dcg_easy.inc", 55)
-            currentLength2 = r"StartVal +\d+"
-            currentLength3 = str(re.search(currentLength2, currentLength).group())
-            currentLength4 = currentLength3.strip("[']")
-            currentLength5 = currentLength4.replace("StartVal ", "").strip()
-            manPowerPoints.set(currentLength5)
-
-            # print(wholeFile)
-
-            currentLength = linecache.getline(r"./resource/set/dynamic_campaign/dcg_easy.inc", 67)
-            currentLength22 = r"StartVal +\d+"
-            currentLength33 = str(re.search(currentLength22, currentLength).group())
-            currentLength44 = currentLength33.strip("[']")
-            currentLength55 = currentLength44.replace("StartVal ", "").strip()
-            starCallPoints.set(currentLength55)
-
-            currentLength = linecache.getline(r"./resource/set/dynamic_campaign/dcg_easy.inc", 75)
-            currentLength222 = r"StartVal +\d+"
-            currentLength333 = str(re.search(currentLength222, currentLength).group())
-            currentLength444 = currentLength333.strip("[']")
-            currentLength555 = currentLength444.replace("StartVal ", "").strip()
-            ammoPoints.set(currentLength555)
-
-            currentLength = linecache.getline(r"./resource/set/dynamic_campaign/dcg_easy.inc", 84)
-            currentLength2222 = r"StartVal +\d+"
-            currentLength3333 = str(re.search(currentLength2222, currentLength).group())
-            currentLength4444 = currentLength3333.strip("[']")
-            currentLength5555 = currentLength4444.replace("StartVal ", "").strip()
-            researchPoints.set(currentLength5555)
-
-
-
-
-
-    elif difficulty.get() == "hard":
-        fileToRead = "./resource/set/dynamic_campaign/dcg_hard.inc"
-        with open(fileToRead, "r") as lengthFile:
-            wholeFile = lengthFile.read()
-            currentLength = linecache.getline(r"./resource/set/dynamic_campaign/dcg_hard.inc", 55)
-            currentLength2 = r"StartVal +\d+"
-            currentLength3 = str(re.search(currentLength2, currentLength).group())
-            currentLength4 = currentLength3.strip("[']")
-            currentLength5 = currentLength4.replace("StartVal ", "").strip()
-            manPowerPoints.set(currentLength5)
-
-            # print(wholeFile)
-
-            currentLength = linecache.getline(r"./resource/set/dynamic_campaign/dcg_hard.inc", 67)
-            currentLength22 = r"StartVal +\d+"
-            currentLength33 = str(re.search(currentLength22, currentLength).group())
-            currentLength44 = currentLength33.strip("[']")
-            currentLength55 = currentLength44.replace("StartVal ", "").strip()
-            starCallPoints.set(currentLength55)
-
-            currentLength = linecache.getline(r"./resource/set/dynamic_campaign/dcg_hard.inc", 75)
-            currentLength222 = r"StartVal +\d+"
-            currentLength333 = str(re.search(currentLength222, currentLength).group())
-            currentLength444 = currentLength333.strip("[']")
-            currentLength555 = currentLength444.replace("StartVal ", "").strip()
-            ammoPoints.set(currentLength555)
-
-            currentLength = linecache.getline(r"./resource/set/dynamic_campaign/dcg_hard.inc", 84)
-            currentLength2222 = r"StartVal +\d+"
-            currentLength3333 = str(re.search(currentLength2222, currentLength).group())
-            currentLength4444 = currentLength3333.strip("[']")
-            currentLength5555 = currentLength4444.replace("StartVal ", "").strip()
-            researchPoints.set(currentLength5555)
-
-    elif difficulty.get() == "normal":
-        fileToRead = "./resource/set/dynamic_campaign/dcg_normal.inc"
-        with open(fileToRead, "r") as lengthFile:
-            wholeFile = lengthFile.read()
-            currentLength = linecache.getline(r"./resource/set/dynamic_campaign/dcg_normal.inc", 55)
-            currentLength2 = r"StartVal +\d+"
-            currentLength3 = str(re.search(currentLength2, currentLength).group())
-            currentLength4 = currentLength3.strip("[']")
-            currentLength5 = currentLength4.replace("StartVal ", "").strip()
-            manPowerPoints.set(currentLength5)
-
-            # print(wholeFile)
-
-            currentLength = linecache.getline(r"./resource/set/dynamic_campaign/dcg_normal.inc", 67)
-            currentLength22 = r"StartVal +\d+"
-            currentLength33 = str(re.search(currentLength22, currentLength).group())
-            currentLength44 = currentLength33.strip("[']")
-            currentLength55 = currentLength44.replace("StartVal ", "").strip()
-            starCallPoints.set(currentLength55)
-
-            currentLength = linecache.getline(r"./resource/set/dynamic_campaign/dcg_normal.inc", 75)
-            currentLength222 = r"StartVal +\d+"
-            currentLength333 = str(re.search(currentLength222, currentLength).group())
-            currentLength444 = currentLength333.strip("[']")
-            currentLength555 = currentLength444.replace("StartVal ", "").strip()
-            ammoPoints.set(currentLength555)
-
-            currentLength = linecache.getline(r"./resource/set/dynamic_campaign/dcg_normal.inc", 84)
-            currentLength2222 = r"StartVal +\d+"
-            currentLength3333 = str(re.search(currentLength2222, currentLength).group())
-            currentLength4444 = currentLength3333.strip("[']")
-            currentLength5555 = currentLength4444.replace("StartVal ", "").strip()
-            researchPoints.set(currentLength5555)
-
-
-
-    elif difficulty.get() == "unfair":
-        fileToRead = "./resource/set/dynamic_campaign/dcg_heroic.inc"
-        with open(fileToRead, "r") as lengthFile:
-            wholeFile = lengthFile.read()
-            currentLength = linecache.getline(r"./resource/set/dynamic_campaign/dcg_heroic.inc", 55)
-            currentLength2 = r"StartVal +\d+"
-            currentLength3 = str(re.search(currentLength2, currentLength).group())
-            currentLength4 = currentLength3.strip("[']")
-            currentLength5 = currentLength4.replace("StartVal ", "").strip()
-            manPowerPoints.set(currentLength5)
-
-            # print(wholeFile)
-
-            currentLength = linecache.getline(r"./resource/set/dynamic_campaign/dcg_heroic.inc", 67)
-            currentLength22 = r"StartVal +\d+"
-            currentLength33 = str(re.search(currentLength22, currentLength).group())
-            currentLength44 = currentLength33.strip("[']")
-            currentLength55 = currentLength44.replace("StartVal ", "").strip()
-            starCallPoints.set(currentLength55)
-
-            currentLength = linecache.getline(r"./resource/set/dynamic_campaign/dcg_heroic.inc", 75)
-            currentLength222 = r"StartVal +\d+"
-            currentLength333 = str(re.search(currentLength222, currentLength).group())
-            currentLength444 = currentLength333.strip("[']")
-            currentLength555 = currentLength444.replace("StartVal ", "").strip()
-            ammoPoints.set(currentLength555)
-
-            currentLength = linecache.getline(r"./resource/set/dynamic_campaign/dcg_heroic.inc", 84)
-            currentLength2222 = r"StartVal +\d+"
-            currentLength3333 = str(re.search(currentLength2222, currentLength).group())
-            currentLength4444 = currentLength3333.strip("[']")
-            currentLength5555 = currentLength4444.replace("StartVal ", "").strip()
-            researchPoints.set(currentLength5555)
-
-    def savechanges():
-        with open(fileToRead, "w") as lengthFile:
-
-            newPoints2 = str(manPowerPoints.get())
-            newPoints3 = str(starCallPoints.get())
-            newPoints4 = str(ammoPoints.get())
-            newPoints5 = str(researchPoints.get())
-
-            newf = (wholeFile.replace(currentLength4, str(f"StartVal {newPoints2}")))
-            newf2 = (newf.replace(currentLength44, str(f"StartVal {newPoints3}")))
-            newf3 = (newf2.replace(currentLength444, str(f"StartVal {newPoints4}")))
-            newf4 = (newf3.replace(currentLength4444, str(f"StartVal {newPoints5}")))
-
-            lengthFile.write(newf4)
-            messagebox.showinfo("Saved")
-            # lengthFile.write(wholeFile.replace(currentLength44, str(f"StartVal {newPoints3}")))
-           #  lengthFile.write(wholeFile.replace(currentLength444, str(f"StartVal {newPoints4}")))
-           #  lengthFile.write(wholeFile.replace(currentLength4444, str(f"StartVal {newPoints5}")))
-            resourceStartingWindow.destroy()
-
-      #  with open(fileToRead, "w") as lengthFile:
-        #    newPoints3 = str(starCallPoints.get())
-       #     lengthFile.write(wholeFile.replace(currentLength44, str(f"StartVal {newPoints3}")))
-      #  with open(fileToRead, "w") as lengthFile:
-       #     newPoints4 = str(starCallPoints.get())
-       #     lengthFile.write(wholeFile.replace(currentLength444, str(f"StartVal {newPoints4}")))
-      #  with open(fileToRead, "w") as lengthFile:
-        #    newPoints5 = str(starCallPoints.get())
-         #   lengthFile.write(wholeFile.replace(currentLength4444, str(f"StartVal {newPoints5}")))
-         #   messagebox.showinfo("Saved")
-        #    resourceStartingWindow.destroy()
-
-
-
-    # currentPoints = Entry(fortificationWindow, textvariable=aiSizeCurrent, width=15)
-    # secondLevelspin.delete(0, END)
-    # secondLevelspin.insert(0, currentLength5)
-    # currentPoints.grid(row=2, column=2)
-
-    saveButton = Button(resourceStartingWindow, text="Save changes", command=savechanges)
-    saveButton.grid(row=6, column=1, padx=3)
-
-
-    researchPointslabel=Label(resourceStartingWindow, text="Starting research points").grid(row=1, column=2)
-    manPowerPointlabel = Label(resourceStartingWindow, text="Starting manpower points").grid(row=2,column=2)
-    starCallPointslabel = Label(resourceStartingWindow,text="Starting star points").grid(row=3, column=2)
-    starCallPointslabel = Label(resourceStartingWindow, text="Starting ammo points").grid(row=4, column=2)
-
-
-resourcesStart = Button(root, text="Resources at start", command=resourceStarting)
-resourcesStart.grid(row=5,column=1)
-
-def resourceIncome():
-    resourceIncWindow = Toplevel(root)
-
-    resourceIncWindow.title("Resource income multiplier")
-    resourceIncWindow.geometry('700x250')
-
-    lowRisk = StringVar()
-    standartRisk = StringVar()
-    highRisk = StringVar()
-
-
-    lowRiskspin = Spinbox(resourceIncWindow, from_=1.00, to=100.00, textvariable=lowRisk).grid(row=3,column=1)
-    standartRiskspin = Spinbox(resourceIncWindow, from_=1.00, to=100.00, textvariable=standartRisk).grid(row=4,column=1)
-    highRiskspin = Spinbox(resourceIncWindow, from_=1.00, to=100.00, textvariable=highRisk).grid(row=5,column=1)
-
-
-    if difficulty.get() == "performance":
-        fileToRead = "./resource/set/dynamic_campaign/dcg_easy.inc"
-        with open(fileToRead, "r") as lengthFile:
-            wholeFile = lengthFile.read()
-            currentLength = linecache.getline(r"./resource/set/dynamic_campaign/dcg_easy.inc", 39)
-            #currentLength4 = currentLength.strip("}")
-            currentLength5 = currentLength.replace("			{Rewards ", "").strip()
-            lowRisk.set(currentLength5.replace("}",""))
-
-            currentLength1 = linecache.getline(r"./resource/set/dynamic_campaign/dcg_easy.inc", 44)
-           # currentLength44 = currentLength1.strip("}")
-            currentLength55 = currentLength1.replace("			{Rewards ", "").strip()
-            standartRisk.set(currentLength55.replace("}",""))
-
-            currentLength11 = linecache.getline(r"./resource/set/dynamic_campaign/dcg_easy.inc", 49)
-           # currentLength444 = currentLength11.strip("}")
-            currentLength555 = currentLength11.replace("			{Rewards ", "").strip()
-            highRisk.set((currentLength555.replace("}","")))
-
-
-
-    elif difficulty.get() == "hard":
-        fileToRead = "./resource/set/dynamic_campaign/dcg_hard.inc"
-        with open(fileToRead, "r") as lengthFile:
-            wholeFile = lengthFile.read()
-            currentLength = linecache.getline(r"./resource/set/dynamic_campaign/dcg_hard.inc", 39)
-            # currentLength4 = currentLength.strip("}")
-            currentLength5 = currentLength.replace("			{Rewards ", "").strip()
-            lowRisk.set(currentLength5.replace("}", ""))
-
-            currentLength1 = linecache.getline(r"./resource/set/dynamic_campaign/dcg_hard.inc", 44)
-            # currentLength44 = currentLength1.strip("}")
-            currentLength55 = currentLength1.replace("			{Rewards ", "").strip()
-            standartRisk.set(currentLength55.replace("}", ""))
-
-            currentLength11 = linecache.getline(r"./resource/set/dynamic_campaign/dcg_hard.inc", 49)
-            # currentLength444 = currentLength11.strip("}")
-            currentLength555 = currentLength11.replace("			{Rewards ", "").strip()
-            highRisk.set((currentLength555.replace("}", "")))
-
-    elif difficulty.get() == "normal":
-        fileToRead = "./resource/set/dynamic_campaign/dcg_normal.inc"
-        with open(fileToRead, "r") as lengthFile:
-            wholeFile = lengthFile.read()
-            currentLength = linecache.getline(r"./resource/set/dynamic_campaign/dcg_normal.inc", 39)
-            # currentLength4 = currentLength.strip("}")
-            currentLength5 = currentLength.replace("			{Rewards ", "").strip()
-            lowRisk.set(currentLength5.replace("}", ""))
-
-            currentLength1 = linecache.getline(r"./resource/set/dynamic_campaign/dcg_normal.inc", 44)
-            # currentLength44 = currentLength1.strip("}")
-            currentLength55 = currentLength1.replace("			{Rewards ", "").strip()
-            standartRisk.set(currentLength55.replace("}", ""))
-
-            currentLength11 = linecache.getline(r"./resource/set/dynamic_campaign/dcg_normal.inc", 49)
-            # currentLength444 = currentLength11.strip("}")
-            currentLength555 = currentLength11.replace("			{Rewards ", "").strip()
-            highRisk.set((currentLength555.replace("}", "")))
-
-
-
-
-    elif difficulty.get() == "unfair":
-        fileToRead = "./resource/set/dynamic_campaign/dcg_heroic.inc"
-        with open(fileToRead, "r") as lengthFile:
-            wholeFile = lengthFile.read()
-            currentLength = linecache.getline(r"./resource/set/dynamic_campaign/dcg_heroic.inc", 39)
-            # currentLength4 = currentLength.strip("}")
-            currentLength5 = currentLength.replace("			{Rewards ", "").strip()
-            lowRisk.set(currentLength5.replace("}", ""))
-
-            currentLength1 = linecache.getline(r"./resource/set/dynamic_campaign/dcg_heroic.inc", 44)
-            # currentLength44 = currentLength1.strip("}")
-            currentLength55 = currentLength1.replace("			{Rewards ", "").strip()
-            standartRisk.set(currentLength55.replace("}", ""))
-
-            currentLength11 = linecache.getline(r"./resource/set/dynamic_campaign/dcg_heroic.inc", 49)
-            # currentLength444 = currentLength11.strip("}")
-            currentLength555 = currentLength11.replace("			{Rewards ", "").strip()
-            highRisk.set((currentLength555.replace("}", "")))
-
-
-    def savechanges():
-        with open(fileToRead, "w") as lengthFile:
-            newPoints2 = str(lowRisk.get().strip())
-            newPoints3 = str(standartRisk.get().strip())
-            newPoints4 = str(highRisk.get().strip())
-
-
-            newf = (wholeFile.replace(currentLength, str(f"			{{Rewards {newPoints2}}}\n")))
-            newf2 = (newf.replace(currentLength1, str(f"			{{Rewards {newPoints3}}}\n")))
-            newf3 = (newf2.replace(currentLength11, str(f"			{{Rewards {newPoints4}}}\n")))
-
-
-            lengthFile.write(newf3)
-            messagebox.showinfo("Saved")
-            # lengthFile.write(wholeFile.replace(currentLength44, str(f"StartVal {newPoints3}")))
-            #  lengthFile.write(wholeFile.replace(currentLength444, str(f"StartVal {newPoints4}")))
-            #  lengthFile.write(wholeFile.replace(currentLength4444, str(f"StartVal {newPoints5}")))
-            resourceIncWindow.destroy()
-
-
-    saveButton = Button(resourceIncWindow, text="Save changes", command=savechanges)
-    saveButton.grid(row=6, column=1, padx=3)
-
-    infoLabel = Label (resourceIncWindow, text="This is a multiplier depending on the risk level (Stars) of the mission.\n First is 1 star,second is 2 star and third is 3 star.")
-    infoLabel.grid(row=1, column=1, padx=3)
-
-
-
-resources = Button(root, text="Resource Income", command=resourceIncome)
-resources.grid(row=6,column=1)
-
-def aiFortifications():
-    fortificationWindow = Toplevel(root)
-
-    fortificationWindow.title("AI defense research speed")
-    fortificationWindow.geometry('700x250')
-
-    #firstLevel = StringVar()
-    secondLevel = StringVar()
-    thirdLevel = StringVar()
-
-   # firstLevelspin = Spinbox(fortificationWindow, from_=1.0, to=100.0, textvariable=firstLevel).grid(row=1, column=1)
-    secondLevelspin = Spinbox(fortificationWindow, from_=1.0, to=100.0, textvariable=secondLevel).grid(row=2, column=1)
-    thirdLevelspin = Spinbox(fortificationWindow, from_=1.0, to=100.0, textvariable=thirdLevel).grid(row=3, column=1)
-
-
-   # firstLevellabel=Label(fortificationWindow, text="Amount of missions played for first defense level to be researched").grid(row=1, column=2)
-    secondLevellabel = Label(fortificationWindow, text="Amount of missions played for second defense level to be researched").grid(row=2,
-                                                                                                            column=2)
-    thirdLevellabel = Label(fortificationWindow,text="Amount of missions played for third defense level to be researched").grid(row=3,
-                                                                                                            column=2)
-
-    if difficulty.get() == "performance":
-         fileToRead = "./resource/set/dynamic_campaign/dcg_easy.inc"
-         with open(fileToRead, "r") as lengthFile:
-             wholeFile = lengthFile.read()
-             currentLength = linecache.getline(r"./resource/set/dynamic_campaign/dcg_easy.inc", 23)
-             currentLength2 = r"unlock games +\d+"
-             currentLength3 = str(re.search(currentLength2, currentLength).group())
-             currentLength4 = currentLength3.strip("[']")
-             currentLength5 = currentLength4.replace("unlock games ","").strip()
-             secondLevel.set(currentLength5)
-
-             #print(wholeFile)
-
-
-             currentLength1 = linecache.getline(r"./resource/set/dynamic_campaign/dcg_easy.inc", 28)
-             currentLength22 = r"unlock games +\d+"
-             currentLength33 = str(re.search(currentLength22, currentLength1).group())
-             currentLength44 = currentLength33.strip("[']")
-             currentLength55 = currentLength44.replace("unlock games ", "").strip()
-             thirdLevel.set(currentLength55)
-
-
-
-
-
-    elif difficulty.get() == "hard":
-        fileToRead = "./resource/set/dynamic_campaign/dcg_hard.inc"
-        with open(fileToRead, "r") as lengthFile:
-            wholeFile = lengthFile.read()
-            currentLength = linecache.getline(r"./resource/set/dynamic_campaign/dcg_hard.inc", 23)
-            currentLength2 = r"unlock games +\d+"
-            currentLength3 = str(re.search(currentLength2, currentLength).group())
-            currentLength4 = currentLength3.strip("[']")
-            currentLength5 = currentLength4.replace("unlock games ", "").strip()
-            secondLevel.set(currentLength5)
-
-            # print(wholeFile)
-
-            currentLength1 = linecache.getline(r"./resource/set/dynamic_campaign/dcg_hard.inc", 28)
-            currentLength22 = r"unlock games +\d+"
-            currentLength33 = str(re.search(currentLength22, currentLength1).group())
-            currentLength44 = currentLength33.strip("[']")
-            currentLength55 = currentLength44.replace("unlock games ", "").strip()
-            thirdLevel.set(currentLength55)
-
-
-
-    elif difficulty.get() == "normal":
-        fileToRead = "./resource/set/dynamic_campaign/dcg_normal.inc"
-        with open(fileToRead, "r") as lengthFile:
-            wholeFile = lengthFile.read()
-            currentLength = linecache.getline(r"./resource/set/dynamic_campaign/dcg_normal.inc", 23)
-            currentLength2 = r"unlock games +\d+"
-            currentLength3 = str(re.search(currentLength2, currentLength).group())
-            currentLength4 = currentLength3.strip("[']")
-            currentLength5 = currentLength4.replace("unlock games ", "").strip()
-            secondLevel.set(currentLength5)
-
-            # print(wholeFile)
-
-            currentLength1 = linecache.getline(r"./resource/set/dynamic_campaign/dcg_normal.inc", 28)
-            currentLength22 = r"unlock games +\d+"
-            currentLength33 = str(re.search(currentLength22, currentLength1).group())
-            currentLength44 = currentLength33.strip("[']")
-            currentLength55 = currentLength44.replace("unlock games ", "").strip()
-            thirdLevel.set(currentLength55)
-
-
-
-
-
-    elif difficulty.get() == "unfair":
-        fileToRead = "./resource/set/dynamic_campaign/dcg_heroic.inc"
-        with open(fileToRead, "r") as lengthFile:
-            wholeFile = lengthFile.read()
-            currentLength = linecache.getline(r"./resource/set/dynamic_campaign/dcg_heroic.inc", 23)
-            currentLength2 = r"unlock games +\d+"
-            currentLength3 = str(re.search(currentLength2, currentLength).group())
-            currentLength4 = currentLength3.strip("[']")
-            currentLength5 = currentLength4.replace("unlock games ", "").strip()
-            secondLevel.set(currentLength5)
-
-            # print(wholeFile)
-
-            currentLength1 = linecache.getline(r"./resource/set/dynamic_campaign/dcg_heroic.inc", 28)
-            currentLength22 = r"unlock games +\d+"
-            currentLength33 = str(re.search(currentLength22, currentLength1).group())
-            currentLength44 = currentLength33.strip("[']")
-            currentLength55 = currentLength44.replace("unlock games ", "").strip()
-            thirdLevel.set(currentLength55)
-
-
-
-    def savechanges():
-         with open(fileToRead, "w") as lengthFile:
-
-
-              newPoints2 = str(secondLevel.get())
-              newPoints3 = str(thirdLevel.get())
-              newf = (wholeFile.replace(currentLength, str(f"				{{unlock games {newPoints2}}}\n")))
-              newf2 = (newf.replace(currentLength1, str(f"				{{unlock games {newPoints3}}}\n")))
-              lengthFile.write(newf2)
-              messagebox.showinfo("Saved")
-
-              fortificationWindow.destroy()
-
-
-
-
-
-
-
-    #currentPoints = Entry(fortificationWindow, textvariable=aiSizeCurrent, width=15)
-   # secondLevelspin.delete(0, END)
-   # secondLevelspin.insert(0, currentLength5)
-   # currentPoints.grid(row=2, column=2)
-
-    saveButton = Button(fortificationWindow, text="Save changes", command=savechanges)
-    saveButton.grid(row=4, column=1, padx=3)
-    #saveButton = Button(fortificationWindow, text="Save changes for 3rd level", command=savechanges2)
-    #saveButton.grid(row=5, column=1, padx=3)
-
-    fortificationWindowlabel = Label(fortificationWindow,text=f"Change how many battles it takes for AI to reseach 2 and 3 defense level.").grid(row=1, column=2)
-
-
-aiFortification = Button(root, text="AI defense stage research speed", command=aiFortifications)
-aiFortification.grid(row=7,column=1)
-
-def damages():
-    damageWindow = Toplevel(root)
-
-    damageWindow.title("Enable or disable modded bullet damage")
-    damageWindow.geometry('300x250')
-
-    damageModevar = StringVar(value="Mod Damage")
-
-
-    modDamage = Radiobutton(damageWindow, text="Modded damage", variable=damageModevar, value="Mod Damage")
-    modDamage.grid(row=1, column=1)
-    vanillaDamage = Radiobutton(damageWindow, text="Vanilla damage", variable=damageModevar,value="Vanilla Damage")
-    vanillaDamage.grid(row=2, column=1)
-
-    def savechanges():
-        if damageModevar.get() == "Mod Damage":
-            with open("./configurator files/moddedballistics.set", "r") as lengthFile:
-                wholeFile = lengthFile.read()
-
-            with open("./resource/set/ballistics.set", "w") as lengthFile:
-                lengthFile.write(wholeFile)
-
-            messagebox.showinfo("Saved")
-            damageWindow.destroy()
-        else:
-            with open("./configurator files/vanillaballistics.set", "r") as lengthFile:
-                wholeFile = lengthFile.read()
-
-            with open("./resource/set/ballistics.set", "w") as lengthFile:
-                lengthFile.write(wholeFile)
-
-            messagebox.showinfo("Saved")
-            damageWindow.destroy()
-    saveButton = Button(damageWindow, text="Save changes", command=savechanges)
-    saveButton.grid(row=3, column=2, padx=3)
-
-damage = Button(root, text="Vanilla or mod damage settings", command=damages)
-damage.grid(row=8,column=1)
-
-def resupplies():
-    resupplyWindow = Toplevel(root)
-
-    resupplyWindow.title("Enable or disable resupplying enemy equipment")
-
-
-    resupplyAm = StringVar(value="notResupplying")
-
-    noResupply = Radiobutton(resupplyWindow, text="Resupplying enemy equipment NOT allowed", variable=resupplyAm,value="notResupplying")
-    noResupply.grid(row=1, column=1)
-    yesResupply = Radiobutton(resupplyWindow, text="Resupplying enemy equipment allowed", variable=resupplyAm,value="Resupplying")
-    yesResupply.grid(row=2,column=1)
-
-    def savechanges():
-       if resupplyAm.get()== "Resupplying":
-           with open("./resource/properties/resupply.inc", "r") as lengthFile:
-               gerDefault = str('("items_light_generic")	("items_light_ger")	("items_heavy_ger")	("items_light_fin")	("items_heavy_fin") ("items_heavy_generic")')
-               sovDefault = str('("items_light_generic")	("items_light_rus")	("items_light_eng")	("items_light_usa")	("items_heavy_rus")	("items_heavy_eng")	("items_heavy_generic")')
-               gerNew = str('("items_light_generic")	("items_light_ger")	("items_heavy_ger")	("items_light_fin")	("items_heavy_fin") ("items_heavy_generic")("items_light_rus")	("items_light_eng")	("items_light_usa")	("items_heavy_rus")	("items_heavy_eng")')
-               sovNew = str('("items_light_generic")	("items_light_rus")	("items_light_eng")	("items_light_usa")	("items_heavy_rus")	("items_heavy_eng")	("items_heavy_generic")("items_light_ger")	("items_heavy_ger")	("items_light_fin")	("items_heavy_fin")')
-               wholeFile = lengthFile.read()
-               wholeFile = wholeFile.replace(str(gerDefault),str(gerNew))
-               wholeFile = wholeFile.replace(str(sovDefault), str(sovNew))
-           with open("./resource/properties/resupply.inc", "w") as lengthFile:
-               lengthFile.write(wholeFile)
-
-           messagebox.showinfo("Saved")
-           resupplyWindow.destroy()
-       else:
-           with open("./resource/properties/resupply.inc", "r") as lengthFile:
-               gerDefault = str('("items_light_generic")	("items_light_ger")	("items_heavy_ger")	("items_light_fin")	("items_heavy_fin") ("items_heavy_generic")')
-               sovDefault = str('("items_light_generic")	("items_light_rus")	("items_light_eng")	("items_light_usa")	("items_heavy_rus")	("items_heavy_eng")	("items_heavy_generic")')
-               gerNew = str('("items_light_generic")	("items_light_ger")	("items_heavy_ger")	("items_light_fin")	("items_heavy_fin") ("items_heavy_generic")("items_light_rus")	("items_light_eng")	("items_light_usa")	("items_heavy_rus")	("items_heavy_eng")')
-               sovNew = str('("items_light_generic")	("items_light_rus")	("items_light_eng")	("items_light_usa")	("items_heavy_rus")	("items_heavy_eng")	("items_heavy_generic")("items_light_ger")	("items_heavy_ger")	("items_light_fin")	("items_heavy_fin")')
-               wholeFile = lengthFile.read()
-               wholeFile = wholeFile.replace(str(gerNew), str(gerDefault))
-               wholeFile = wholeFile.replace(str(sovNew), str(sovDefault))
-           with open("./resource/properties/resupply.inc", "w") as lengthFile:
-               lengthFile.write(wholeFile)
-           messagebox.showinfo("Saved")
-           resupplyWindow.destroy()
-       # with open("./resource/set/multiplayer/games/campaign_capture_the_flag.set", "w") as lengthFile:
-
-           # newPoints=str(currentPoints.get())
-           # lengthFile.write(wholeFile.replace(currentLength4,newPoints))
-
-
-
-
-
-
-    saveButton = Button(resupplyWindow, text="Save changes", command=savechanges)
-    saveButton.grid(row=3, column=2, padx=3)
-
-
-
-resupply = Button(root, text="Resupply enemy equipment or not", command=resupplies)
-resupply.grid(row=9,column=1)
-
-
-
-def lengthGame():
-    lengthWindow = Toplevel(root)
-
-    lengthWindow.title("Changing amount of points to win")
-    lengthWindow.geometry('700x150')
-    currentLength= ""
-    with open("./resource/set/multiplayer/games/campaign_capture_the_flag.set", "r") as lengthFile:
-        wholeFile = lengthFile.read()
-        currentLength = linecache.getline(r"./resource/set/multiplayer/games/campaign_capture_the_flag.set", 44)
-        currentLength2 = r"[0-9]?[0-9]?[0-9]?[0-9]?[0-9]?[0-9]"
-        currentLength3 = str((re.findall(currentLength2,currentLength)))
-        currentLength4 = currentLength3.strip("[']")
-
-
-    def savechanges():
-        with open("./resource/set/multiplayer/games/campaign_capture_the_flag.set", "w") as lengthFile:
-
-            newPoints=str(currentPoints.get())
-            lengthFile.write(wholeFile.replace(currentLength4,newPoints))
-            messagebox.showinfo("Saved")
-            lengthWindow.destroy()
-
-
-    currentPoints = Entry(lengthWindow,textvariable=currentLength4,width=15)
-    currentPoints.delete(0, END)
-    currentPoints.insert(0, currentLength4)
-    currentPoints.grid(row=2,column=2)
-
-
-    saveButton = Button(lengthWindow, text="Save changes", command=savechanges)
-    saveButton.grid(row=3, column=2, padx=3)
-
-    tipLength = Label(lengthWindow,text=" 24000 mean around 30-35 minutes of defense so \ncount accordingly").grid(row=1,column=2)
-
-
-
-
-
-
-lengthGame = Button(root, text="Amount of points to win", command=lengthGame)
-lengthGame.grid(row=10,column=1)
-
-def aiResearches():
-    aiResearchWindow = Toplevel(root)
-    aiResearchWindow.title("Change the speed of AI research")
-    aiResearchWindow.geometry('400x350')
-
-    aiProg= StringVar(value="normal")
-
-    normalProgressvar = '{ResearchStages "0:1 1:2 2:3 3:4 4:5 5:6 6:7 7:8 8:9 9:10 10:11 11:12 12:13 13:14 14:15 15:16 16:17 17:18 18:19 19:20"}'
-    slow30Progressvar = '{ResearchStages "0:1 1:1 2:2 3:2 4:3 5:4 6:5 7:6 8:7 9:8 10:9 11:10 12:11 13:12 14:13 15:14 16:15 17:16 18:17 19:18 20:19 21:20"}'
-    slow60Progressvar = '{ResearchStages "0:1 1:1 2:2 3:2 4:2 5:3 6:3 7:4 8:4 9:5 10:5 11:6 12:7 13:8 14:9 15:9 16:10 17:11 18:12 19:13 20:14 21:15 22:16 23:17 24:18 25:19 25:20"}'
-    fastProgressvar = '{ResearchStages "0:2 1:2 2:4 3:4 4:6 5:6 6:8 7:8 8:10 9:10 10:12 11:13 12:14 13:15 14:16 15:18 16:19 17:20"}'
-
-    print(aiProg.get())
-    if difficulty.get() == "performance":
-        fileToRead = "./resource/set/dynamic_campaign/dcg_easy.inc"
-        with open(fileToRead, "r") as lengthFile:
-              wholeFile = lengthFile.read()
-            # currentLength = linecache.getline(r"./resource/set/dynamic_campaign/dcg_easy.inc", 37)
-          #   currentLength2 = r"BotResources +\d+"
-         #    currentLength3 = str(re.search(currentLength2, wholeFile).group())
-          #   currentLength4 = currentLength3.strip("[']")
-              currentLength5 = wholeFile.replace(fastProgressvar, normalProgressvar)
-              currentLength6 = currentLength5.replace(slow30Progressvar, normalProgressvar)
-              currentLength7 = currentLength6.replace(slow60Progressvar, normalProgressvar)
-              currentLength8 = currentLength7.replace(normalProgressvar, normalProgressvar)
-
-
-
-
-    elif difficulty.get() == "hard":
-        fileToRead = "./resource/set/dynamic_campaign/dcg_hard.inc"
-        with open(fileToRead, "r") as lengthFile:
-            wholeFile = lengthFile.read()
-            currentLength5 = wholeFile.replace(fastProgressvar, normalProgressvar)
-            currentLength6 = currentLength5.replace(slow30Progressvar, normalProgressvar)
-            currentLength7 = currentLength6.replace(slow60Progressvar, normalProgressvar)
-            currentLength8 = currentLength7.replace(normalProgressvar, normalProgressvar)
-
-    elif difficulty.get() == "normal":
-        fileToRead = "./resource/set/dynamic_campaign/dcg_normal.inc"
-        with open(fileToRead, "r") as lengthFile:
-            wholeFile = lengthFile.read()
-            currentLength5 = wholeFile.replace(fastProgressvar, normalProgressvar)
-            currentLength6 = currentLength5.replace(slow30Progressvar, normalProgressvar)
-            currentLength7 = currentLength6.replace(slow60Progressvar, normalProgressvar)
-            currentLength8 = currentLength7.replace(normalProgressvar, normalProgressvar)
-
-
-
-
-    elif difficulty.get() == "unfair":
-        fileToRead = "./resource/set/dynamic_campaign/dcg_heroic.inc"
-        with open(fileToRead, "r") as lengthFile:
-            wholeFile = lengthFile.read()
-
-            currentLength5 = wholeFile.replace(fastProgressvar, normalProgressvar)
-            currentLength6 = currentLength5.replace(slow30Progressvar, normalProgressvar)
-            currentLength7 = currentLength6.replace(slow60Progressvar, normalProgressvar)
-            currentLength8 = currentLength7.replace(normalProgressvar, normalProgressvar)
-
-    def savechanges():
-        if aiProg.get() == "slow30":
-
-            currentLength8 = currentLength7.replace(normalProgressvar, slow30Progressvar)
-            print(currentLength8)
-
-            with open(fileToRead, "w") as lengthFile:
-                lengthFile.write(currentLength8)
-
-            messagebox.showinfo("Saved")
-
-            aiResearchWindow.destroy()
-        if aiProg.get() == "slow60":
-
-            currentLength8 = currentLength7.replace(normalProgressvar, slow60Progressvar)
-            print(currentLength8)
-
-            with open(fileToRead, "w") as lengthFile:
-                lengthFile.write(currentLength8)
-
-            messagebox.showinfo("Saved")
-
-            aiResearchWindow.destroy()
-
-        if aiProg.get() == "fast":
-            currentLength8 = currentLength7.replace(normalProgressvar, fastProgressvar)
-            print(currentLength8)
-
-            with open(fileToRead, "w") as lengthFile:
-                lengthFile.write(currentLength8)
-
-            messagebox.showinfo("Saved")
-
-            aiResearchWindow.destroy()
-        if aiProg.get() == "normal":
-            currentLength8 = currentLength7.replace(normalProgressvar, normalProgressvartProgressvar)
-            print(currentLength8)
-
-            with open(fileToRead, "w") as lengthFile:
-                lengthFile.write(currentLength8)
-
-            messagebox.showinfo("Saved")
-
-            aiResearchWindow.destroy()
-
-
-    saveButton = Button(aiResearchWindow, text="Save changes", command=savechanges)
-    saveButton.grid(row=8, column=2, padx=3)
-    normalPro = Radiobutton(aiResearchWindow, text="Normal AI progression", variable=aiProg,value="normal")
-    normalPro.grid(row=2, column=1)
-    slow30Pro = Radiobutton(aiResearchWindow, text="30% slower AI progression", variable=aiProg, value="slow30")
-    slow30Pro.grid(row=3, column=1)
-    slow60Pro = Radiobutton(aiResearchWindow, text="60% slower AI progression", variable=aiProg,value="slow60")
-    slow60Pro.grid(row=4, column=1)
-    fastPro = Radiobutton(aiResearchWindow, text="Faster AI progression", variable=aiProg,value="fast")
-    fastPro.grid(row=5, column=1)
-
-
-
-
-aiResearch = Button(root, text="AI research speed progression", command=aiResearches)
-aiResearch.grid(row=11,column=1)
-
-#NEED TO CHANGE RESUPPLY FILE ACCORDINGLY
-def regenerateAmmos():
-    regenerateAmmosWindow = Toplevel(root)
-
-    regenerateAmmosWindow.title("Make trucks regenerate ammo")
-    regenerateAmmosWindow.geometry('400x350')
-
-    regenerateAmmosvar = StringVar(value="No regen")
-
-    noRegenerateAmmos = Radiobutton(regenerateAmmosWindow, text="Trucks don't regenerate ammo", variable=regenerateAmmosvar, value="No regen")
-    noRegenerateAmmos.grid(row=1, column=1)
-    RegenerateAmmos = Radiobutton(regenerateAmmosWindow, text="Trucks regenerate ammo", variable=regenerateAmmosvar, value="Regen")
-    RegenerateAmmos.grid(row=2, column=1)
-
-    def savechanges():
-         noRegen = "{regenerationPeriod 0};"
-         yesRegen = "{regenerationPeriod 5};"
-         if regenerateAmmosvar.get() == "No regen":
-             with open("./resource/properties/resupply.inc", "r") as lengthFile:
-                   wholeFile = lengthFile.read()
-                   wholeFile = wholeFile.replace(yesRegen,noRegen)
-                   print(yesRegen)
-
-             with open("./resource/properties/resupply.inc", "w") as lengthFile:
-                  lengthFile.write(wholeFile)
-                  #print(wholeFile)
-
-                  messagebox.showinfo("Saved")
-                  regenerateAmmosWindow.destroy()
-         elif regenerateAmmosvar.get() == "Regen":
-              with open("./resource/properties/resupply.inc", "r") as lengthFile:
-                   wholeFile = lengthFile.read()
-                   wholeFile = wholeFile.replace(noRegen,yesRegen)
-                   print(wholeFile)
-
-              with open("./resource/properties/resupply.inc", "w") as lengthFile:
-                   lengthFile.write(wholeFile)
-                   print(wholeFile)
-
-                   messagebox.showinfo("Saved")
-                   regenerateAmmosWindow.destroy()
-
-
-    saveButton = Button(regenerateAmmosWindow, text="Save changes", command=savechanges)
-    saveButton.grid(row=3, column=2, padx=3)
-
-
-
-
-regenerateAmmo = Button(root, text="Make supply trucks regenerate ammo", command=regenerateAmmos)
-regenerateAmmo.grid(row=12,column=1)
-
-def openPeriod():
-    campaignPeriod = Toplevel(root)
-    campaignPeriod.title("Choose war period for your conquest")
-    campaignPeriod.geometry('400x350+50+50')
-    messagebox.showinfo("Warning", "Experimental feature! When you set the war period the difficulty files will  be reset!!! So if you changed anything before that, you'll have to do it again. If you don't want to change anything just press 'leave'")
-    campaignPeriod.focus_force()
-    def setNormalPeriod():
-           with open("./configurator files/normal/roster/units_fin.set", "r") as lengthFile:
-                finUnits = lengthFile.read()
-
-           with open("./resource/set/multiplayer/units/conquest/units_fin.set", "w") as lengthFile:
-                lengthFile.write(finUnits)
-
-           with open("./configurator files/normal/roster/units_fin2.set", "r") as lengthFile:
-               finnUnits = lengthFile.read()
-
-           with open("./resource/set/multiplayer/units/conquest/units_fin2.set", "w") as lengthFile:
-               lengthFile.write(finnUnits)
-
-           with open("./configurator files/normal/roster/units_ger.set", "r") as lengthFile:
-               gerUnits = lengthFile.read()
-
-           with open("./resource/set/multiplayer/units/conquest/units_ger.set", "w") as lengthFile:
-               lengthFile.write(gerUnits)
-
-           with open("./configurator files/normal/roster/units_ger2.set", "r") as lengthFile:
-                gerrUnits = lengthFile.read()
-
-           with open("./resource/set/multiplayer/units/conquest/units_ger2.set", "w") as lengthFile:
-                lengthFile.write(gerrUnits)
-
-           with open("./configurator files/normal/roster/units_rus.set", "r") as lengthFile:
-                sovUnits = lengthFile.read()
-
-           with open("./resource/set/multiplayer/units/conquest/units_rus.set", "w") as lengthFile:
-                lengthFile.write(sovUnits)
-
-           with open("./configurator files/normal/roster/units_rus2.set", "r") as lengthFile:
-                russUnits = lengthFile.read()
-
-           with open("./resource/set/multiplayer/units/conquest/units_rus2.set", "w") as lengthFile:
-                lengthFile.write(russUnits)
-
-           with open("./configurator files/normal/conquest_configuration/bot.wave_system.lua", "r") as lengthFile:
-                botWave = lengthFile.read()
-
-           with open("./resource/script/multiplayer/bot.wave_system.lua", "w") as lengthFile:
-                lengthFile.write(botWave)
-
-           with open("./configurator files/normal/conquest_configuration/bot.lua", "r") as lengthFile:
-                botF = lengthFile.read()
-
-           with open("./resource/script/multiplayer/bot.lua", "w") as lengthFile:
-                lengthFile.write(botF)
-
-           with open("./configurator files/normal/dynamic_campaign/dcg_easy.inc", "r") as lengthFile:
-                easyD = lengthFile.read()
-
-           with open("./resource/set/dynamic_campaign/dcg_easy.inc", "w") as lengthFile:
-                lengthFile.write(easyD)
-
-           with open("./configurator files/normal/dynamic_campaign/dcg_normal.inc", "r") as lengthFile:
-               normalD = lengthFile.read()
-
-           with open("./resource/set/dynamic_campaign/dcg_normal.inc", "w") as lengthFile:
-               lengthFile.write(normalD)
-
-           with open("./configurator files/normal/dynamic_campaign/dcg_hard.inc", "r") as lengthFile:
-               hardD = lengthFile.read()
-
-           with open("./resource/set/dynamic_campaign/dcg_hard.inc", "w") as lengthFile:
-               lengthFile.write(hardD)
-           with open("./configurator files/normal/dynamic_campaign/dcg_heroic.inc", "r") as lengthFile:
-               heroD = lengthFile.read()
-
-           with open("./resource/set/dynamic_campaign/dcg_heroic.inc", "w") as lengthFile:
-               lengthFile.write(heroD)
-
-           with open("./configurator files/normal/dynamic_campaign/unit_research_fin.set", "r") as lengthFile:
-               finRes = lengthFile.read()
-
-           with open("./resource/set/dynamic_campaign/unit_research_fin.set", "w") as lengthFile:
-               lengthFile.write(finRes)
-
-           with open("./configurator files/normal/dynamic_campaign/unit_research_fin2.set", "r") as lengthFile:
-               finRess = lengthFile.read()
-
-           with open("./resource/set/dynamic_campaign/unit_research_fin2.set", "w") as lengthFile:
-               lengthFile.write(finRess)
-
-           with open("./configurator files/normal/dynamic_campaign/unit_research_ger.set", "r") as lengthFile:
-               gerRes = lengthFile.read()
-
-           with open("./resource/set/dynamic_campaign/unit_research_ger.set", "w") as lengthFile:
-               lengthFile.write(gerRes)
-
-           with open("./configurator files/normal/dynamic_campaign/unit_research_ger2.set", "r") as lengthFile:
-               gerRess = lengthFile.read()
-
-           with open("./resource/set/dynamic_campaign/unit_research_ger2.set", "w") as lengthFile:
-               lengthFile.write(gerRess)
-           with open("./configurator files/normal/dynamic_campaign/unit_research_rus.set", "r") as lengthFile:
-               rusRes = lengthFile.read()
-
-           with open("./resource/set/dynamic_campaign/unit_research_rus.set", "w") as lengthFile:
-               lengthFile.write(rusRes)
-
-           with open("./configurator files/normal/dynamic_campaign/unit_research_rus2.set", "r") as lengthFile:
-               rusRess = lengthFile.read()
-
-           with open("./resource/set/dynamic_campaign/unit_research_rus.set", "w") as lengthFile:
-               lengthFile.write(rusRess)
-
-           aiResearch.config(state="normal")
-           messagebox.showinfo("Saved")
-           campaignPeriod.destroy()
-
-    def setEarlyPeriod():
-        with open("./configurator files/earlywar/roster/units_fin.set", "r") as lengthFile:
-            finUnits = lengthFile.read()
-
-        with open("./resource/set/multiplayer/units/conquest/units_fin.set", "w") as lengthFile:
-            lengthFile.write(finUnits)
-
-        with open("./configurator files/earlywar/roster/units_fin2.set", "r") as lengthFile:
-            finnUnits = lengthFile.read()
-
-        with open("./resource/set/multiplayer/units/conquest/units_fin2.set", "w") as lengthFile:
-            lengthFile.write(finnUnits)
-
-        with open("./configurator files/earlywar/roster/units_ger.set", "r") as lengthFile:
-            gerUnits = lengthFile.read()
-
-        with open("./resource/set/multiplayer/units/conquest/units_ger.set", "w") as lengthFile:
-            lengthFile.write(gerUnits)
-
-        with open("./configurator files/earlywar/roster/units_ger2.set", "r") as lengthFile:
-            gerrUnits = lengthFile.read()
-
-        with open("./resource/set/multiplayer/units/conquest/units_ger2.set", "w") as lengthFile:
-            lengthFile.write(gerrUnits)
-
-        with open("./configurator files/earlywar/roster/units_rus.set", "r") as lengthFile:
-            sovUnits = lengthFile.read()
-
-        with open("./resource/set/multiplayer/units/conquest/units_rus.set", "w") as lengthFile:
-            lengthFile.write(sovUnits)
-
-        with open("./configurator files/earlywar/roster/units_rus2.set", "r") as lengthFile:
-            russUnits = lengthFile.read()
-
-        with open("./resource/set/multiplayer/units/conquest/units_rus2.set", "w") as lengthFile:
-            lengthFile.write(russUnits)
-
-        with open("./configurator files/earlywar/conquest_configuration/bot.wave_system.lua", "r") as lengthFile:
-            botWave = lengthFile.read()
-
-        with open("./resource/script/multiplayer/bot.wave_system.lua", "w") as lengthFile:
-            lengthFile.write(botWave)
-
-        with open("./configurator files/earlywar/conquest_configuration/bot.lua", "r") as lengthFile:
-            botF = lengthFile.read()
-
-        with open("./resource/script/multiplayer/bot.lua", "w") as lengthFile:
-            lengthFile.write(botF)
-
-        with open("./configurator files/earlywar/dynamic_campaign/dcg_easy.inc", "r") as lengthFile:
-            easyD = lengthFile.read()
-
-        with open("./resource/set/dynamic_campaign/dcg_easy.inc", "w") as lengthFile:
-            lengthFile.write(easyD)
-
-        with open("./configurator files/earlywar/dynamic_campaign/dcg_normal.inc", "r") as lengthFile:
-            normalD = lengthFile.read()
-
-        with open("./resource/set/dynamic_campaign/dcg_normal.inc", "w") as lengthFile:
-            lengthFile.write(normalD)
-
-        with open("./configurator files/earlywar/dynamic_campaign/dcg_hard.inc", "r") as lengthFile:
-            hardD = lengthFile.read()
-
-        with open("./resource/set/dynamic_campaign/dcg_hard.inc", "w") as lengthFile:
-            lengthFile.write(hardD)
-        with open("./configurator files/earlywar/dynamic_campaign/dcg_heroic.inc", "r") as lengthFile:
-            heroD = lengthFile.read()
-
-        with open("./resource/set/dynamic_campaign/dcg_heroic.inc", "w") as lengthFile:
-            lengthFile.write(heroD)
-
-        with open("./configurator files/earlywar/dynamic_campaign/unit_research_fin.set", "r") as lengthFile:
-            finRes = lengthFile.read()
-
-        with open("./resource/set/dynamic_campaign/unit_research_fin.set", "w") as lengthFile:
-            lengthFile.write(finRes)
-
-        with open("./configurator files/earlywar/dynamic_campaign/unit_research_fin2.set", "r") as lengthFile:
-            finRess = lengthFile.read()
-
-        with open("./resource/set/dynamic_campaign/unit_research_fin2.set", "w") as lengthFile:
-            lengthFile.write(finRess)
-
-        with open("./configurator files/earlywar/dynamic_campaign/unit_research_ger.set", "r") as lengthFile:
-            gerRes = lengthFile.read()
-
-        with open("./resource/set/dynamic_campaign/unit_research_ger.set", "w") as lengthFile:
-            lengthFile.write(gerRes)
-
-        with open("./configurator files/earlywar/dynamic_campaign/unit_research_ger2.set", "r") as lengthFile:
-            gerRess = lengthFile.read()
-
-        with open("./resource/set/dynamic_campaign/unit_research_ger2.set", "w") as lengthFile:
-            lengthFile.write(gerRess)
-        with open("./configurator files/earlywar/dynamic_campaign/unit_research_rus.set", "r") as lengthFile:
-            rusRes = lengthFile.read()
-
-        with open("./resource/set/dynamic_campaign/unit_research_rus.set", "w") as lengthFile:
-            lengthFile.write(rusRes)
-
-        with open("./configurator files/earlywar/dynamic_campaign/unit_research_rus2.set", "r") as lengthFile:
-            rusRess = lengthFile.read()
-
-        with open("./resource/set/dynamic_campaign/unit_research_rus.set", "w") as lengthFile:
-            lengthFile.write(rusRess)
-
-        aiResearch.config(state="disabled")
-        messagebox.showinfo("Saved")
-        campaignPeriod.destroy()
-    def setMidPeriod():
-        with open("./configurator files/midwar/roster/units_fin.set", "r") as lengthFile:
-            finUnits = lengthFile.read()
-
-        with open("./resource/set/multiplayer/units/conquest/units_fin.set", "w") as lengthFile:
-            lengthFile.write(finUnits)
-
-        with open("./configurator files/midwar/roster/units_fin2.set", "r") as lengthFile:
-            finnUnits = lengthFile.read()
-
-        with open("./resource/set/multiplayer/units/conquest/units_fin2.set", "w") as lengthFile:
-            lengthFile.write(finnUnits)
-
-        with open("./configurator files/midwar/roster/units_ger.set", "r") as lengthFile:
-            gerUnits = lengthFile.read()
-
-        with open("./resource/set/multiplayer/units/conquest/units_ger.set", "w") as lengthFile:
-            lengthFile.write(gerUnits)
-
-        with open("./configurator files/midwar/roster/units_ger2.set", "r") as lengthFile:
-            gerrUnits = lengthFile.read()
-
-        with open("./resource/set/multiplayer/units/conquest/units_ger2.set", "w") as lengthFile:
-            lengthFile.write(gerrUnits)
-
-        with open("./configurator files/midwar/roster/units_rus.set", "r") as lengthFile:
-            sovUnits = lengthFile.read()
-
-        with open("./resource/set/multiplayer/units/conquest/units_rus.set", "w") as lengthFile:
-            lengthFile.write(sovUnits)
-
-        with open("./configurator files/midwar/roster/units_rus2.set", "r") as lengthFile:
-            russUnits = lengthFile.read()
-
-        with open("./resource/set/multiplayer/units/conquest/units_rus2.set", "w") as lengthFile:
-            lengthFile.write(russUnits)
-
-        with open("./configurator files/midwar/conquest_configuration/bot.wave_system.lua", "r") as lengthFile:
-            botWave = lengthFile.read()
-
-        with open("./resource/script/multiplayer/bot.wave_system.lua", "w") as lengthFile:
-            lengthFile.write(botWave)
-
-        with open("./configurator files/midwar/conquest_configuration/bot.lua", "r") as lengthFile:
-            botF = lengthFile.read()
-
-        with open("./resource/script/multiplayer/bot.lua", "w") as lengthFile:
-            lengthFile.write(botF)
-
-        with open("./configurator files/midwar/dynamic_campaign/dcg_easy.inc", "r") as lengthFile:
-            easyD = lengthFile.read()
-
-        with open("./resource/set/dynamic_campaign/dcg_easy.inc", "w") as lengthFile:
-            lengthFile.write(easyD)
-
-        with open("./configurator files/midwar/dynamic_campaign/dcg_normal.inc", "r") as lengthFile:
-            normalD = lengthFile.read()
-
-        with open("./resource/set/dynamic_campaign/dcg_normal.inc", "w") as lengthFile:
-            lengthFile.write(normalD)
-
-        with open("./configurator files/midwar/dynamic_campaign/dcg_hard.inc", "r") as lengthFile:
-            hardD = lengthFile.read()
-
-        with open("./resource/set/dynamic_campaign/dcg_hard.inc", "w") as lengthFile:
-            lengthFile.write(hardD)
-        with open("./configurator files/midwar/dynamic_campaign/dcg_heroic.inc", "r") as lengthFile:
-            heroD = lengthFile.read()
-
-        with open("./resource/set/dynamic_campaign/dcg_heroic.inc", "w") as lengthFile:
-            lengthFile.write(heroD)
-
-        with open("./configurator files/midwar/dynamic_campaign/unit_research_fin.set", "r") as lengthFile:
-            finRes = lengthFile.read()
-
-        with open("./resource/set/dynamic_campaign/unit_research_fin.set", "w") as lengthFile:
-            lengthFile.write(finRes)
-
-        with open("./configurator files/midwar/dynamic_campaign/unit_research_fin2.set", "r") as lengthFile:
-            finRess = lengthFile.read()
-
-        with open("./resource/set/dynamic_campaign/unit_research_fin2.set", "w") as lengthFile:
-            lengthFile.write(finRess)
-
-        with open("./configurator files/midwar/dynamic_campaign/unit_research_ger.set", "r") as lengthFile:
-            gerRes = lengthFile.read()
-
-        with open("./resource/set/dynamic_campaign/unit_research_ger.set", "w") as lengthFile:
-            lengthFile.write(gerRes)
-
-        with open("./configurator files/midwar/dynamic_campaign/unit_research_ger2.set", "r") as lengthFile:
-            gerRess = lengthFile.read()
-
-        with open("./resource/set/dynamic_campaign/unit_research_ger2.set", "w") as lengthFile:
-            lengthFile.write(gerRess)
-        with open("./configurator files/midwar/dynamic_campaign/unit_research_rus.set", "r") as lengthFile:
-            rusRes = lengthFile.read()
-
-        with open("./resource/set/dynamic_campaign/unit_research_rus.set", "w") as lengthFile:
-            lengthFile.write(rusRes)
-
-        with open("./configurator files/midwar/dynamic_campaign/unit_research_rus2.set", "r") as lengthFile:
-            rusRess = lengthFile.read()
-
-        with open("./resource/set/dynamic_campaign/unit_research_rus.set", "w") as lengthFile:
-            lengthFile.write(rusRess)
-
-        aiResearch.config(state="disabled")
-        messagebox.showinfo("Saved")
-        campaignPeriod.destroy()
-    def setLatePeriod():
-        with open("./configurator files/latewar/roster/units_fin.set", "r") as lengthFile:
-            finUnits = lengthFile.read()
-
-        with open("./resource/set/multiplayer/units/conquest/units_fin.set", "w") as lengthFile:
-            lengthFile.write(finUnits)
-
-        with open("./configurator files/latewar/roster/units_fin2.set", "r") as lengthFile:
-            finnUnits = lengthFile.read()
-
-        with open("./resource/set/multiplayer/units/conquest/units_fin2.set", "w") as lengthFile:
-            lengthFile.write(finnUnits)
-
-        with open("./configurator files/latewar/roster/units_ger.set", "r") as lengthFile:
-            gerUnits = lengthFile.read()
-
-        with open("./resource/set/multiplayer/units/conquest/units_ger.set", "w") as lengthFile:
-            lengthFile.write(gerUnits)
-
-        with open("./configurator files/latewar/roster/units_ger2.set", "r") as lengthFile:
-            gerrUnits = lengthFile.read()
-
-        with open("./resource/set/multiplayer/units/conquest/units_ger2.set", "w") as lengthFile:
-            lengthFile.write(gerrUnits)
-
-        with open("./configurator files/latewar/roster/units_rus.set", "r") as lengthFile:
-            sovUnits = lengthFile.read()
-
-        with open("./resource/set/multiplayer/units/conquest/units_rus.set", "w") as lengthFile:
-            lengthFile.write(sovUnits)
-
-        with open("./configurator files/latewar/roster/units_rus2.set", "r") as lengthFile:
-            russUnits = lengthFile.read()
-
-        with open("./resource/set/multiplayer/units/conquest/units_rus2.set", "w") as lengthFile:
-            lengthFile.write(russUnits)
-
-        with open("./configurator files/latewar/conquest_configuration/bot.wave_system.lua", "r") as lengthFile:
-            botWave = lengthFile.read()
-
-        with open("./resource/script/multiplayer/bot.wave_system.lua", "w") as lengthFile:
-            lengthFile.write(botWave)
-
-        with open("./configurator files/latewar/conquest_configuration/bot.lua", "r") as lengthFile:
-            botF = lengthFile.read()
-
-        with open("./resource/script/multiplayer/bot.lua", "w") as lengthFile:
-            lengthFile.write(botF)
-
-        with open("./configurator files/latewar/dynamic_campaign/dcg_easy.inc", "r") as lengthFile:
-            easyD = lengthFile.read()
-
-        with open("./resource/set/dynamic_campaign/dcg_easy.inc", "w") as lengthFile:
-            lengthFile.write(easyD)
-
-        with open("./configurator files/latewar/dynamic_campaign/dcg_normal.inc", "r") as lengthFile:
-            normalD = lengthFile.read()
-
-        with open("./resource/set/dynamic_campaign/dcg_normal.inc", "w") as lengthFile:
-            lengthFile.write(normalD)
-
-        with open("./configurator files/latewar/dynamic_campaign/dcg_hard.inc", "r") as lengthFile:
-            hardD = lengthFile.read()
-
-        with open("./resource/set/dynamic_campaign/dcg_hard.inc", "w") as lengthFile:
-            lengthFile.write(hardD)
-        with open("./configurator files/latewar/dynamic_campaign/dcg_heroic.inc", "r") as lengthFile:
-            heroD = lengthFile.read()
-
-        with open("./resource/set/dynamic_campaign/dcg_heroic.inc", "w") as lengthFile:
-            lengthFile.write(heroD)
-
-        with open("./configurator files/latewar/dynamic_campaign/unit_research_fin.set", "r") as lengthFile:
-            finRes = lengthFile.read()
-
-        with open("./resource/set/dynamic_campaign/unit_research_fin.set", "w") as lengthFile:
-            lengthFile.write(finRes)
-
-        with open("./configurator files/latewar/dynamic_campaign/unit_research_fin2.set", "r") as lengthFile:
-            finRess = lengthFile.read()
-
-        with open("./resource/set/dynamic_campaign/unit_research_fin2.set", "w") as lengthFile:
-            lengthFile.write(finRess)
-
-        with open("./configurator files/latewar/dynamic_campaign/unit_research_ger.set", "r") as lengthFile:
-            gerRes = lengthFile.read()
-
-        with open("./resource/set/dynamic_campaign/unit_research_ger.set", "w") as lengthFile:
-            lengthFile.write(gerRes)
-
-        with open("./configurator files/latewar/dynamic_campaign/unit_research_ger2.set", "r") as lengthFile:
-            gerRess = lengthFile.read()
-
-        with open("./resource/set/dynamic_campaign/unit_research_ger2.set", "w") as lengthFile:
-            lengthFile.write(gerRess)
-        with open("./configurator files/latewar/dynamic_campaign/unit_research_rus.set", "r") as lengthFile:
-            rusRes = lengthFile.read()
-
-        with open("./resource/set/dynamic_campaign/unit_research_rus.set", "w") as lengthFile:
-            lengthFile.write(rusRes)
-
-        with open("./configurator files/latewar/dynamic_campaign/unit_research_rus2.set", "r") as lengthFile:
-            rusRess = lengthFile.read()
-
-        with open("./resource/set/dynamic_campaign/unit_research_rus.set", "w") as lengthFile:
-            lengthFile.write(rusRess)
-
-        aiResearch.config(state="disabled")
-        messagebox.showinfo("Saved")
-        campaignPeriod.destroy()
-
-
-    def leav():
-        campaignPeriod.destroy()
-
-
-    normalPeriod = Button(campaignPeriod,text="All war 1939-1945",command=setNormalPeriod).grid(row=2,column=3)
-    earlyPeriod= Button(campaignPeriod,text="Early war 1939-1941",command=setEarlyPeriod).grid(row=3,column=3)
-    midPeriod= Button(campaignPeriod,text="Mid war 1941-1943",command=setMidPeriod).grid(row=4,column=3)
-    latePeriod= Button(campaignPeriod,text="Late war 1943-1945",command=setLatePeriod).grid(row=5,column=3)
-    leave = Button(campaignPeriod,text="leave",command=leav).grid(row=6,column=3)
-    periodLabel=Label(text="Choose war period for your conquest").grid(row=1,column=3)
-
-
-periodButton = Button(root, text="War period", command=openPeriod).grid(row=2,column=1)
-
-
-
-
-
-
-#epoint = Entry(root, width=20)
-
-#epoint.pack()
-
-
-#global difficulty
-#difficulty = StringVar(value="normal")
-#performance =Radiobutton(root, text="performance(easy)", variable=difficulty,value="performance",command=typedifficulty).grid(row=5,column=2)
-#normal = Radiobutton(root, text="normal", variable=difficulty,value="normal",command=typedifficulty).grid(row=2,column=2)
-#hard = Radiobutton(root, text="hard", variable=difficulty,value="hard",command=typedifficulty).grid(row=3,column=2)
-#unfair = Radiobutton(root, text="unfair", variable=difficulty,value="unfair",command=typedifficulty).grid(row=4,column=2)
-
-#choosedifficulty =Label(root, text="Choose your difficulty before changing anything").grid(row=1,column=2)
-
-#def typelength():
- #   print(campLength.get())
-#campLength = StringVar(value="short")
-#shortLength =Radiobutton(root, text="short", variable=campLength,value="short",command=typelength).grid(row=7,column=2)
-#normalLength = Radiobutton(root, text="normal", variable=campLength,value="normal",command=typelength).grid(row=8,column=2)
-#longLength = Radiobutton(root, text="long", variable=campLength,value="long",command=typelength).grid(row=9,column=2)
-#vLongLength = Radiobutton(root, text="very long", variable=campLength,value="very long",command=typelength).grid(row=10,column=2)
-#unlimited = Radiobutton(root, text="unlimited", variable=campLength,value="unlimited",command=typelength).grid(row=11,column=2)
-#chooseLength =Label(root, text="Choose your campaign Length").grid(row=6,column=2)
-
-
-
-
-#def checking ():
-   # global difficulty
-   # print(difficulty.get())
-   # if difficulty == performance:
-   #      with open("dcg_easy.inc") as file:
-   #           contents = file.readlines(5)
-   #           epoint.insert(0, contents)
-
-   # elif difficulty == normal:
-   #     with open("dcg_normal.inc") as file:
-   #              contents = file.readlines(5)
-   #              epoint.insert(0, contents)
-
-#checkbtn = Button(root, text='check', command=checking).grid(row=5,column=1)
-
-#print(difficulty)
-
-#def settingChoose():
-
-
-#button_setting = Button(root, text="<<", command=settingChoose)
-#button_setting.pack()
-
-def showhelp():
-    helpWindow = Toplevel(root)
-    textLabel = Label(helpWindow,text="This programme allows you to easily edit mod files. \n But the guide linked in the mod description \n is still the safest way to edit the game.\n If you have any questions about this programme please message me \n in discord linked in the description or in official GoH discord.").grid(row=1,column=1)
-
-
-
-
-Button(root, text="help", command=showhelp).grid(row=15,column=2)
-madeBy=Label(root, text="made by MrCookie for Conquest Enhanced mod.\n The code will be available on github if you want to do\n something like that for your mod.").grid (row=14,column=1)
-
-root.mainloop()
-
+import os
+import shutil
+from typing import Dict, Any
+
+# Set up logging
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s',
+                    filename='ce_configurator.log', filemode='w')
+
+
+class Configurator:
+    def __init__(self, root):
+        self.root = root
+        self.root.title("CE Configurator")
+        self.root.geometry("800x600")
+
+        self.config = self.load_config()
+        self.difficulty = tk.StringVar(value="normal")
+        self.ai_army_size = tk.StringVar(value="6")
+        self.points_to_win = tk.StringVar(value="24000")
+        self.ammo_regen = tk.StringVar(value="No regen")
+        self.damage_mode = tk.StringVar(value="Mod Damage")
+
+        self.setup_ui()
+
+    def load_config(self) -> Dict[str, Any]:
+        try:
+            with open('config.json', 'r') as f:
+                return json.load(f)
+        except (FileNotFoundError, json.JSONDecodeError):
+            return self.create_default_config()
+
+    def create_default_config(self) -> Dict[str, Any]:
+        config = {
+            "base_dir": os.path.dirname(os.path.abspath(__file__)),
+            "backup_dir": os.path.join(os.path.dirname(os.path.abspath(__file__)), "backups"),
+            "periods": ["normal", "early", "mid", "late"],
+            "files_to_update": [
+                "units_fin.set", "units_fin2.set", "units_ger.set", "units_ger2.set",
+                "units_rus.set", "units_rus2.set", "bot.wave_system.lua", "bot.lua",
+                "dcg_easy.inc", "dcg_normal.inc", "dcg_hard.inc", "dcg_heroic.inc",
+                "unit_research_fin.set", "unit_research_fin2.set", "unit_research_ger.set",
+                "unit_research_ger2.set", "unit_research_rus.set", "unit_research_rus2.set"
+            ]
+        }
+        with open('config.json', 'w') as f:
+            json.dump(config, f, indent=4)
+        return config
+
+    def setup_ui(self):
+        main_frame = ttk.Frame(self.root, padding="10")
+        main_frame.grid(row=0, column=0, sticky=(tk.W, tk.E, tk.N, tk.S))
+        self.root.columnconfigure(0, weight=1)
+        self.root.rowconfigure(0, weight=1)
+
+        # Difficulty selection
+        ttk.Label(main_frame, text="Difficulty:").grid(column=0, row=0, sticky=tk.W, pady=5)
+        difficulties = [("Performance (Easy)", "performance"), ("Normal", "normal"),
+                        ("Hard", "hard"), ("Unfair", "unfair")]
+        for i, (text, value) in enumerate(difficulties):
+            ttk.Radiobutton(main_frame, text=text, variable=self.difficulty,
+                            value=value).grid(column=1, row=i, sticky=tk.W, pady=2)
+
+        # AI Army Size
+        ttk.Label(main_frame, text="AI Army Size:").grid(column=0, row=4, sticky=tk.W, pady=5)
+        ttk.Entry(main_frame, textvariable=self.ai_army_size, width=10).grid(column=1, row=4, sticky=tk.W)
+        ttk.Button(main_frame, text="Update", command=self.update_ai_army_size).grid(column=2, row=4, padx=5)
+
+        # Points to Win
+        ttk.Label(main_frame, text="Points to Win:").grid(column=0, row=5, sticky=tk.W, pady=5)
+        ttk.Entry(main_frame, textvariable=self.points_to_win, width=10).grid(column=1, row=5, sticky=tk.W)
+        ttk.Button(main_frame, text="Update", command=self.update_points_to_win).grid(column=2, row=5, padx=5)
+
+        # Ammo Regeneration
+        ttk.Label(main_frame, text="Ammo Regeneration:").grid(column=0, row=6, sticky=tk.W, pady=5)
+        ttk.Radiobutton(main_frame, text="No Regeneration", variable=self.ammo_regen,
+                        value="No regen").grid(column=1, row=6, sticky=tk.W)
+        ttk.Radiobutton(main_frame, text="Regeneration", variable=self.ammo_regen,
+                        value="Regen").grid(column=1, row=7, sticky=tk.W)
+        ttk.Button(main_frame, text="Update", command=self.update_ammo_regen).grid(column=2, row=6, padx=5)
+
+        # Damage Settings
+        ttk.Label(main_frame, text="Damage Settings:").grid(column=0, row=8, sticky=tk.W, pady=5)
+        ttk.Radiobutton(main_frame, text="Modded Damage", variable=self.damage_mode,
+                        value="Mod Damage").grid(column=1, row=8, sticky=tk.W)
+        ttk.Radiobutton(main_frame, text="Vanilla Damage", variable=self.damage_mode,
+                        value="Vanilla Damage").grid(column=1, row=9, sticky=tk.W)
+        ttk.Button(main_frame, text="Update", command=self.update_damage_settings).grid(column=2, row=8, padx=5)
+
+        # Buttons for options that still open new windows
+        ttk.Button(main_frame, text="Set War Period", command=self.open_period_window).grid(column=0, row=10,
+                                                                                            sticky=tk.W, pady=10)
+        ttk.Button(main_frame, text="Player Army Size", command=self.player_army_size).grid(column=0, row=11,
+                                                                                            sticky=tk.W, pady=5)
+        ttk.Button(main_frame, text="Preparation Time", command=self.preparation_time).grid(column=0, row=12,
+                                                                                            sticky=tk.W, pady=5)
+        ttk.Button(main_frame, text="Resources at Start", command=self.resources_starting).grid(column=0, row=13,
+                                                                                                sticky=tk.W, pady=5)
+        ttk.Button(main_frame, text="Resource Income", command=self.resource_income).grid(column=0, row=14, sticky=tk.W,
+                                                                                          pady=5)
+        ttk.Button(main_frame, text="AI Defense Research Speed", command=self.ai_fortifications).grid(column=0, row=15,
+                                                                                                      sticky=tk.W,
+                                                                                                      pady=5)
+        ttk.Button(main_frame, text="AI Research Speed", command=self.ai_researches).grid(column=0, row=16, sticky=tk.W,
+                                                                                          pady=5)
+
+        ttk.Button(main_frame, text="Help", command=self.show_help).grid(column=0, row=17, sticky=tk.W, pady=20)
+
+    def update_ai_army_size(self):
+        try:
+            size = float(self.ai_army_size.get())
+            if 1 <= size <= 10:
+                self.save_numeric_setting("BotResources", str(size), r"BotResources +\d+")
+                messagebox.showinfo("Success", "AI Army Size updated successfully!")
+            else:
+                messagebox.showerror("Error", "AI Army Size must be between 1 and 10")
+        except ValueError:
+            messagebox.showerror("Error", "Invalid input for AI Army Size")
+
+    def update_points_to_win(self):
+        try:
+            points = int(self.points_to_win.get())
+            if points > 0:
+                file_path = "./resource/set/multiplayer/games/campaign_capture_the_flag.set"
+                self.save_numeric_setting_to_file(file_path, "winpoints", str(points), r"winpoints *?\d+")
+                messagebox.showinfo("Success", "Points to Win updated successfully!")
+            else:
+                messagebox.showerror("Error", "Points to Win must be a positive integer")
+        except ValueError:
+            messagebox.showerror("Error", "Invalid input for Points to Win")
+
+    def update_ammo_regen(self):
+        file_path = "./resource/properties/resupply.inc"
+        try:
+            with open(file_path, "r") as file:
+                content = file.read()
+
+            if self.ammo_regen.get() == "Regen":
+                content = content.replace("{regenerationPeriod 0};", "{regenerationPeriod 5};")
+            else:
+                content = content.replace("{regenerationPeriod 5};", "{regenerationPeriod 0};")
+
+            with open(file_path, "w") as file:
+                file.write(content)
+
+            messagebox.showinfo("Success", "Ammo regeneration settings updated successfully!")
+        except Exception as e:
+            logging.error(f"Error updating ammo regeneration settings: {str(e)}")
+            messagebox.showerror("Error", "Failed to update ammo regeneration settings")
+
+    def update_damage_settings(self):
+        try:
+            source_file = "./configurator files/moddedballistics.set" if self.damage_mode.get() == "Mod Damage" else "./configurator files/vanillaballistics.set"
+            target_file = "./resource/set/ballistics.set"
+            shutil.copy2(source_file, target_file)
+            messagebox.showinfo("Success", f"{self.damage_mode.get()} settings applied successfully!")
+        except Exception as e:
+            logging.error(f"Error updating damage settings: {str(e)}")
+            messagebox.showerror("Error", "Failed to update damage settings")
+
+    def save_numeric_setting(self, setting: str, value: str, pattern: str):
+        file_to_read = self.get_difficulty_file()
+        self.save_numeric_setting_to_file(file_to_read, setting, value, pattern)
+
+    def save_numeric_setting_to_file(self, file_path: str, setting: str, value: str, pattern: str):
+        try:
+            with open(file_path, "r") as file:
+                content = file.read()
+
+            content = re.sub(pattern, f"{setting} {value}", content)
+
+            with open(file_path, "w") as file:
+                file.write(content)
+
+        except Exception as e:
+            logging.error(f"Error updating {setting}: {str(e)}")
+            messagebox.showerror("Error", f"Failed to update {setting}")
+
+    def get_difficulty_file(self):
+        difficulty_files = {
+            "performance": "./resource/set/dynamic_campaign/dcg_easy.inc",
+            "normal": "./resource/set/dynamic_campaign/dcg_normal.inc",
+            "hard": "./resource/set/dynamic_campaign/dcg_hard.inc",
+            "unfair": "./resource/set/dynamic_campaign/dcg_heroic.inc"
+        }
+        return difficulty_files.get(self.difficulty.get(), difficulty_files["normal"])
+
+    def open_period_window(self):
+        period_window = tk.Toplevel(self.root)
+        period_window.title("Choose War Period")
+        period_window.geometry('400x350')
+
+        ttk.Label(period_window, text="Select War Period", font=("Helvetica", 14)).grid(row=0, column=0, columnspan=2,
+                                                                                        pady=10)
+
+        periods = [
+            ("All War (1939-1945)", "normal"),
+            ("Early War (1939-1941)", "early"),
+            ("Mid War (1941-1943)", "mid"),
+            ("Late War (1943-1945)", "late")
+        ]
+
+        for i, (text, period) in enumerate(periods):
+            ttk.Button(period_window, text=text, command=lambda p=period: self.set_period(p, period_window)).grid(
+                row=i + 1, column=0, columnspan=2, pady=5)
+
+        ttk.Button(period_window, text="Cancel", command=period_window.destroy).grid(row=len(periods) + 1, column=0,
+                                                                                     columnspan=2, pady=10)
+
+        warning_text = "Warning: Setting the war period will reset difficulty files.\nAny previous changes will be lost."
+        ttk.Label(period_window, text=warning_text, foreground="red", wraplength=350).grid(row=len(periods) + 2,
+                                                                                           column=0, columnspan=2,
+                                                                                           pady=10)
+
+    def set_period(self, period: str, window: tk.Toplevel):
+        try:
+            self.backup_files()
+            self.update_files(period)
+            messagebox.showinfo("Success", f"{period.capitalize()} war period set successfully!")
+            window.destroy()
+        except Exception as e:
+            logging.error(f"Error setting {period} period: {str(e)}")
+            messagebox.showerror("Error", f"Failed to set {period} period. Check the log for details.")
+            self.rollback()
+
+    def backup_files(self):
+        backup_dir = self.config['backup_dir']
+        os.makedirs(backup_dir, exist_ok=True)
+
+        for file in self.config['files_to_update']:
+            src = os.path.join(self.config['base_dir'], "resource", file)
+            dst = os.path.join(backup_dir, file)
+            os.makedirs(os.path.dirname(dst), exist_ok=True)
+            try:
+                shutil.copy2(src, dst)
+            except FileNotFoundError:
+                logging.warning(f"File not found, skipping backup: {src}")
+            except PermissionError:
+                raise Exception(f"Permission denied when trying to backup {src}")
+
+    def update_files(self, period: str):
+        progress_window = tk.Toplevel(self.root)
+        progress_window.title("Updating Files")
+        progress = ttk.Progressbar(progress_window, length=300, mode='determinate')
+        progress.pack(pady=10)
+        status_label = ttk.Label(progress_window, text="Updating files...")
+        status_label.pack()
+
+        total_files = len(self.config['files_to_update'])
+        for i, file in enumerate(self.config['files_to_update']):
+            src = os.path.join(self.config['base_dir'], "configurator files", f"{period}war", file)
+            dst = os.path.join(self.config['base_dir'], "resource", file)
+            try:
+                with open(src, "r") as source_file, open(dst, "w") as dest_file:
+                    dest_file.write(source_file.read())
+            except FileNotFoundError:
+                logging.warning(f"File not found, skipping update: {src}")
+            except PermissionError:
+                raise Exception(f"Permission denied when trying to update {dst}")
+
+            progress['value'] = (i + 1) / total_files * 100
+            status_label.config(text=f"Updating {file}...")
+            progress_window.update()
+
+        progress_window.destroy()
+
+    def rollback(self):
+        backup_dir = self.config['backup_dir']
+        for file in self.config['files_to_update']:
+            src = os.path.join(backup_dir, file)
+            dst = os.path.join(self.config['base_dir'], "resource", file)
+            if os.path.exists(src):
+                try:
+                    shutil.copy2(src, dst)
+                except Exception as e:
+                    logging.error(f"Error during rollback of {file}: {str(e)}")
+        messagebox.showinfo("Rollback", "Changes have been rolled back due to an error.")
+
+    def player_army_size(self):
+        player_size_window = tk.Toplevel(self.root)
+        player_size_window.title("Player Army Size")
+        player_size_window.geometry('700x250')
+
+        each_stage_size = tk.StringVar()
+        whole_budget = tk.StringVar()
+
+        file_to_read = self.get_difficulty_file()
+
+        with open(file_to_read, "r") as length_file:
+            whole_file = length_file.read()
+            stage_cp = re.search(r"\{StageCP ([^\}]+)\}", whole_file)
+            if stage_cp:
+                each_stage_size.set(stage_cp.group(1))
+
+            start_budget = re.search(r'\{Start "([^"]+)"\}', whole_file)
+            if start_budget:
+                whole_budget.set(start_budget.group(1))
+
+        ttk.Label(player_size_window,
+                  text="Size of each stage (keep the space between each number, should be 7 numbers):").grid(row=1,
+                                                                                                             column=0,
+                                                                                                             padx=10,
+                                                                                                             pady=5)
+        ttk.Entry(player_size_window, textvariable=each_stage_size, width=50).grid(row=2, column=0, padx=10, pady=5)
+
+        ttk.Label(player_size_window,
+                  text="Total points for buying stages (in mod, you're supposed to only have enough for 5):").grid(
+            row=3, column=0, padx=10, pady=5)
+        ttk.Entry(player_size_window, textvariable=whole_budget, width=50).grid(row=4, column=0, padx=10, pady=5)
+
+        ttk.Button(player_size_window, text="Save Changes",
+                   command=lambda: self.save_player_army_size(file_to_read, each_stage_size.get(),
+                                                              whole_budget.get(), player_size_window)).grid(row=5,
+                                                                                                            column=0,
+                                                                                                            pady=10)
+
+    def save_player_army_size(self, file_path: str, stage_size: str, budget: str, window: tk.Toplevel):
+        try:
+            with open(file_path, "r") as file:
+                content = file.read()
+
+            content = re.sub(r"\{StageCP [^\}]+\}", f"{{StageCP {stage_size}}}", content)
+            content = re.sub(r'\{Start "[^"]+"\}', f'{{Start "{budget}"}}', content)
+
+            with open(file_path, "w") as file:
+                file.write(content)
+
+            messagebox.showinfo("Success", "Player army size updated successfully!")
+            window.destroy()
+        except Exception as e:
+            logging.error(f"Error updating player army size: {str(e)}")
+            messagebox.showerror("Error", "Failed to update player army size. Check the log for details.")
+
+    def preparation_time(self):
+        prep_window = tk.Toplevel(self.root)
+        prep_window.title("Preparation Time")
+        prep_window.geometry('800x400')
+
+        times = {
+            "oneFlagOffsetTime": tk.StringVar(),
+            "twoFlagOffsetTime": tk.StringVar(),
+            "threeFlagOffsetTime": tk.StringVar(),
+            "fourFlagOffsetTime": tk.StringVar(),
+            "fiveFlagOffsetTime": tk.StringVar()
+        }
+
+        file_path = "./resource/conquest_configuration/bot.conquest_configuration.lua"
+
+        with open(file_path, "r") as file:
+            content = file.read()
+            for key in times:
+                match = re.search(rf"{key} = (\d+)", content)
+                if match:
+                    times[key].set(match.group(1))
+
+        row = 0
+        for key, var in times.items():
+            ttk.Label(prep_window, text=f"Time for {key}:").grid(row=row, column=0, padx=10, pady=5)
+            ttk.Spinbox(prep_window, from_=1, to=10000, textvariable=var).grid(row=row, column=1, padx=10, pady=5)
+            row += 1
+
+        ttk.Button(prep_window, text="Save Changes",
+                   command=lambda: self.save_preparation_time(file_path, times, prep_window)).grid(row=row,
+                                                                                                   column=0,
+                                                                                                   columnspan=2,
+                                                                                                   pady=10)
+
+    def save_preparation_time(self, file_path: str, times: Dict[str, tk.StringVar], window: tk.Toplevel):
+        try:
+            with open(file_path, "r") as file:
+                content = file.read()
+
+            for key, var in times.items():
+                content = re.sub(rf"{key} = \d+", f"{key} = {var.get()}", content)
+
+            with open(file_path, "w") as file:
+                file.write(content)
+
+            messagebox.showinfo("Success", "Preparation times updated successfully!")
+            window.destroy()
+        except Exception as e:
+            logging.error(f"Error updating preparation times: {str(e)}")
+            messagebox.showerror("Error", "Failed to update preparation times. Check the log for details.")
+
+    def resources_starting(self):
+        resources_window = tk.Toplevel(self.root)
+        resources_window.title("Starting Resources")
+        resources_window.geometry('400x250')
+
+        resources = {
+            "Research Points": tk.StringVar(),
+            "Manpower Points": tk.StringVar(),
+            "Star Call Points": tk.StringVar(),
+            "Ammo Points": tk.StringVar()
+        }
+
+        file_to_read = self.get_difficulty_file()
+
+        with open(file_to_read, "r") as file:
+            content = file.read()
+            for resource, var in resources.items():
+                match = re.search(rf"{resource.replace(' ', '')}.*?StartVal (\d+)", content, re.DOTALL)
+                if match:
+                    var.set(match.group(1))
+
+        row = 0
+        for resource, var in resources.items():
+            ttk.Label(resources_window, text=f"Starting {resource}:").grid(row=row, column=0, padx=10, pady=5)
+            ttk.Spinbox(resources_window, from_=1, to=100000, textvariable=var).grid(row=row, column=1, padx=10,
+                                                                                     pady=5)
+            row += 1
+
+        ttk.Button(resources_window, text="Save Changes",
+                   command=lambda: self.save_resources_starting(file_to_read, resources, resources_window)).grid(
+            row=row, column=0, columnspan=2, pady=10)
+
+    def save_resources_starting(self, file_path: str, resources: Dict[str, tk.StringVar], window: tk.Toplevel):
+        try:
+            with open(file_path, "r") as file:
+                content = file.read()
+
+            for resource, var in resources.items():
+                content = re.sub(rf"({resource.replace(' ', '')}).*?StartVal \d+", rf"\1\nStartVal {var.get()}",
+                                 content, flags=re.DOTALL)
+
+            with open(file_path, "w") as file:
+                file.write(content)
+
+            messagebox.showinfo("Success", "Starting resources updated successfully!")
+            window.destroy()
+        except Exception as e:
+            logging.error(f"Error updating starting resources: {str(e)}")
+            messagebox.showerror("Error", "Failed to update starting resources. Check the log for details.")
+
+    def resource_income(self):
+        income_window = tk.Toplevel(self.root)
+        income_window.title("Resource Income Multiplier")
+        income_window.geometry('400x200')
+
+        risk_levels = {
+            "Low Risk": tk.StringVar(),
+            "Standard Risk": tk.StringVar(),
+            "High Risk": tk.StringVar()
+        }
+
+        file_to_read = self.get_difficulty_file()
+
+        with open(file_to_read, "r") as file:
+            content = file.read()
+            rewards = re.findall(r"\{Rewards ([^}]+)\}", content)
+            for i, var in enumerate(risk_levels.values()):
+                if i < len(rewards):
+                    var.set(rewards[i])
+
+        row = 0
+        for risk, var in risk_levels.items():
+            ttk.Label(income_window, text=f"{risk}:").grid(row=row, column=0, padx=10, pady=5)
+            ttk.Spinbox(income_window, from_=1.00, to=100.00, textvariable=var, format="%.2f", increment=0.1).grid(
+                row=row, column=1, padx=10, pady=5)
+            row += 1
+
+        ttk.Button(income_window, text="Save Changes",
+                   command=lambda: self.save_resource_income(file_to_read, risk_levels, income_window)).grid(
+            row=row, column=0, columnspan=2, pady=10)
+
+    def save_resource_income(self, file_path: str, risk_levels: Dict[str, tk.StringVar], window: tk.Toplevel):
+        try:
+            with open(file_path, "r") as file:
+                content = file.read()
+
+            rewards = [var.get() for var in risk_levels.values()]
+            content = re.sub(r"\{Rewards [^}]+\}", lambda m: f"{{Rewards {rewards.pop(0)}}}", content)
+
+            with open(file_path, "w") as file:
+                file.write(content)
+
+            messagebox.showinfo("Success", "Resource income multipliers updated successfully!")
+            window.destroy()
+        except Exception as e:
+            logging.error(f"Error updating resource income multipliers: {str(e)}")
+            messagebox.showerror("Error",
+                                 "Failed to update resource income multipliers. Check the log for details.")
+
+    def ai_fortifications(self):
+        fort_window = tk.Toplevel(self.root)
+        fort_window.title("AI Defense Research Speed")
+        fort_window.geometry('700x200')
+
+        levels = {
+            "Second Level": tk.StringVar(),
+            "Third Level": tk.StringVar()
+        }
+
+        file_to_read = self.get_difficulty_file()
+
+        with open(file_to_read, "r") as file:
+            content = file.read()
+            for level, var in levels.items():
+                match = re.search(rf"{level}.*?unlock games (\d+)", content, re.DOTALL)
+                if match:
+                    var.set(match.group(1))
+
+        row = 0
+        for level, var in levels.items():
+            ttk.Label(fort_window, text=f"Missions for {level} defense:").grid(row=row, column=0, padx=10, pady=5)
+            ttk.Spinbox(fort_window, from_=1, to=100, textvariable=var).grid(row=row, column=1, padx=10, pady=5)
+            row += 1
+
+        ttk.Button(fort_window, text="Save Changes",
+                   command=lambda: self.save_ai_fortifications(file_to_read, levels, fort_window)).grid(row=row,
+                                                                                                        column=0,
+                                                                                                        columnspan=2,
+                                                                                                        pady=10)
+
+    def save_ai_fortifications(self, file_path: str, levels: Dict[str, tk.StringVar], window: tk.Toplevel):
+        try:
+            with open(file_path, "r") as file:
+                content = file.read()
+
+            for level, var in levels.items():
+                content = re.sub(rf"({level}).*?unlock games \d+", rf"\1\nunlock games {var.get()}", content,
+                                 flags=re.DOTALL)
+
+            with open(file_path, "w") as file:
+                file.write(content)
+
+            messagebox.showinfo("Success", "AI defense research speed updated successfully!")
+            window.destroy()
+        except Exception as e:
+            logging.error(f"Error updating AI defense research speed: {str(e)}")
+            messagebox.showerror("Error", "Failed to update AI defense research speed. Check the log for details.")
+
+    def ai_researches(self):
+        research_window = tk.Toplevel(self.root)
+        research_window.title("AI Research Speed")
+        research_window.geometry('400x200')
+
+        ai_prog = tk.StringVar(value="normal")
+
+        progressions = [
+            ("Normal AI progression", "normal"),
+            ("30% slower AI progression", "slow30"),
+            ("60% slower AI progression", "slow60"),
+            ("Faster AI progression", "fast")
+        ]
+
+        for i, (text, value) in enumerate(progressions):
+            ttk.Radiobutton(research_window, text=text, variable=ai_prog, value=value).grid(row=i, column=0,
+                                                                                            padx=10, pady=5,
+                                                                                            sticky="w")
+
+        ttk.Button(research_window, text="Save Changes",
+                   command=lambda: self.save_ai_researches(ai_prog.get(), research_window)).grid(
+            row=len(progressions), column=0, pady=10)
+
+    def save_ai_researches(self, progression: str, window: tk.Toplevel):
+        file_to_read = self.get_difficulty_file()
+        try:
+            with open(file_to_read, "r") as file:
+                content = file.read()
+
+            progressions = {
+                "normal": '{ResearchStages "0:1 1:2 2:3 3:4 4:5 5:6 6:7 7:8 8:9 9:10 10:11 11:12 12:13 13:14 14:15 15:16 16:17 17:18 18:19 19:20"}',
+                "slow30": '{ResearchStages "0:1 1:1 2:2 3:2 4:3 5:4 6:5 7:6 8:7 9:8 10:9 11:10 12:11 13:12 14:13 15:14 16:15 17:16 18:17 19:18 20:19 21:20"}',
+                "slow60": '{ResearchStages "0:1 1:1 2:2 3:2 4:2 5:3 6:3 7:4 8:4 9:5 10:5 11:6 12:7 13:8 14:9 15:9 16:10 17:11 18:12 19:13 20:14 21:15 22:16 23:17 24:18 25:19 25:20"}',
+                "fast": '{ResearchStages "0:2 1:2 2:4 3:4 4:6 5:6 6:8 7:8 8:10 9:10 10:12 11:13 12:14 13:15 14:16 15:18 16:19 17:20"}'
+            }
+
+            for prog, stages in progressions.items():
+                content = content.replace(stages, progressions[progression])
+
+            with open(file_to_read, "w") as file:
+                file.write(content)
+
+            messagebox.showinfo("Success", "AI research speed updated successfully!")
+            window.destroy()
+        except Exception as e:
+            logging.error(f"Error updating AI research speed: {str(e)}")
+            messagebox.showerror("Error", "Failed to update AI research speed. Check the log for details.")
+
+    def show_help(self):
+        help_text = """
+        CE Configurator Help:
+
+        1. Difficulty Selection:
+           Choose the difficulty level using the radio buttons at the top.
+
+        2. Main Window Controls:
+           - AI Army Size: Set the multiplier for AI army size (normally between 6 and 7).
+           - Points to Win: Set the number of points required to win (24000 is about 30-35 minutes).
+           - Ammo Regeneration: Choose whether supply trucks regenerate ammo or not.
+           - Damage Settings: Toggle between modded and vanilla damage models.
+
+        3. Additional Settings (separate windows):
+           - Set War Period: Choose the time period for the game (affects unit availability).
+           - Player Army Size: Modify the player's army size and budget for each stage.
+           - Preparation Time: Set the time before AI arrives in different scenarios.
+           - Resources at Start: Adjust starting resources for the player.
+           - Resource Income: Modify resource income multipliers based on risk levels.
+           - AI Defense Research Speed: Change how quickly AI researches defenses.
+           - AI Research Speed: Adjust the speed of AI research progression.
+
+        4. File Operations:
+           - The configurator automatically selects the correct files based on the chosen difficulty.
+           - Backups are created before making changes. In case of errors, changes are rolled back.
+
+        5. After Making Changes:
+           - Always check the game to ensure the desired effect.
+           - If you encounter any issues, check the log file (ce_configurator.log) for details.
+
+        6. Additional Information:
+           - For more detailed information, please refer to the mod description.
+           - If you need further assistance, contact the mod author on Discord.
+
+        Remember to use these settings responsibly to maintain game balance and enjoyment.
+        """
+        messagebox.showinfo("CE Configurator Help", help_text)
+
+if __name__ == "__main__":
+    root = tk.Tk()
+    app = Configurator(root)
+    root.mainloop()
