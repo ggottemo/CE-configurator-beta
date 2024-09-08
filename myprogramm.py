@@ -14,9 +14,12 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(
 
 class Configurator:
     def __init__(self, root):
+        self.style = None
         self.root = root
         self.root.title("CE Configurator")
         self.root.geometry("800x600")
+        self.root.resizable(False, False)
+
 
         self.config = self.load_config()
         self.difficulty = tk.StringVar(value="normal")
@@ -24,7 +27,7 @@ class Configurator:
         self.points_to_win = tk.StringVar(value="24000")
         self.ammo_regen = tk.StringVar(value="No regen")
         self.damage_mode = tk.StringVar(value="Mod Damage")
-
+        self.setup_styles()
         self.setup_ui()
 
     def load_config(self) -> Dict[str, Any]:
@@ -33,7 +36,21 @@ class Configurator:
                 return json.load(f)
         except (FileNotFoundError, json.JSONDecodeError):
             return self.create_default_config()
+    def setup_styles(self):
+        self.style = ttk.Style()
+        self.style.theme_use('clam')
 
+        # Configure colors
+        self.style.configure("TFrame", background="#f0f0f0")
+        self.style.configure("TLabel", background="#f0f0f0", font=("Helvetica", 10))
+        self.style.configure("TRadiobutton", background="#f0f0f0", font=("Helvetica", 10))
+        self.style.configure("TButton", background="#4CAF50", foreground="white", font=("Helvetica", 10, "bold"))
+        self.style.map("TButton", background=[('active', '#45a049')])
+
+        # Custom styles
+        self.style.configure("Title.TLabel", font=("Helvetica", 16, "bold"))
+        self.style.configure("Subtitle.TLabel", font=("Helvetica", 12, "bold"))
+        self.style.configure("Section.TFrame", background="#e0e0e0")
     def create_default_config(self) -> Dict[str, Any]:
         config = {
             "base_dir": os.path.dirname(os.path.abspath(__file__)),
@@ -52,63 +69,92 @@ class Configurator:
         return config
 
     def setup_ui(self):
-        main_frame = ttk.Frame(self.root, padding="10")
+        main_frame = ttk.Frame(self.root, padding="20", style="TFrame")
         main_frame.grid(row=0, column=0, sticky=(tk.W, tk.E, tk.N, tk.S))
         self.root.columnconfigure(0, weight=1)
         self.root.rowconfigure(0, weight=1)
 
+        # Title
+        ttk.Label(main_frame, text="CE Configurator", style="Title.TLabel").grid(column=0, row=0, columnspan=3,
+                                                                                 pady=(0, 20))
+
+        # Left Column
+        left_frame = ttk.Frame(main_frame, style="Section.TFrame", padding="10")
+        left_frame.grid(column=0, row=1, sticky=(tk.N, tk.W, tk.E, tk.S), padx=(0, 10))
+
+        ttk.Label(left_frame, text="Game Settings", style="Subtitle.TLabel").grid(column=0, row=0, columnspan=2,
+                                                                                  pady=(0, 10))
+
         # Difficulty selection
-        ttk.Label(main_frame, text="Difficulty:").grid(column=0, row=0, sticky=tk.W, pady=5)
+        ttk.Label(left_frame, text="Difficulty:").grid(column=0, row=1, sticky=tk.W, pady=5)
         difficulties = [("Performance (Easy)", "performance"), ("Normal", "normal"),
                         ("Hard", "hard"), ("Unfair", "unfair")]
         for i, (text, value) in enumerate(difficulties):
-            ttk.Radiobutton(main_frame, text=text, variable=self.difficulty,
-                            value=value).grid(column=1, row=i, sticky=tk.W, pady=2)
+            ttk.Radiobutton(left_frame, text=text, variable=self.difficulty,
+                            value=value).grid(column=1, row=i + 1, sticky=tk.W, pady=2)
 
         # AI Army Size
-        ttk.Label(main_frame, text="AI Army Size:").grid(column=0, row=4, sticky=tk.W, pady=5)
-        ttk.Entry(main_frame, textvariable=self.ai_army_size, width=10).grid(column=1, row=4, sticky=tk.W)
-        ttk.Button(main_frame, text="Update", command=self.update_ai_army_size).grid(column=2, row=4, padx=5)
+        ttk.Label(left_frame, text="AI Army Size:").grid(column=0, row=5, sticky=tk.W, pady=5)
+        ttk.Entry(left_frame, textvariable=self.ai_army_size, width=10).grid(column=1, row=5, sticky=tk.W)
+        ttk.Button(left_frame, text="Update", command=self.update_ai_army_size).grid(column=2, row=5, padx=5)
 
         # Points to Win
-        ttk.Label(main_frame, text="Points to Win:").grid(column=0, row=5, sticky=tk.W, pady=5)
-        ttk.Entry(main_frame, textvariable=self.points_to_win, width=10).grid(column=1, row=5, sticky=tk.W)
-        ttk.Button(main_frame, text="Update", command=self.update_points_to_win).grid(column=2, row=5, padx=5)
+        ttk.Label(left_frame, text="Points to Win:").grid(column=0, row=6, sticky=tk.W, pady=5)
+        ttk.Entry(left_frame, textvariable=self.points_to_win, width=10).grid(column=1, row=6, sticky=tk.W)
+        ttk.Button(left_frame, text="Update", command=self.update_points_to_win).grid(column=2, row=6, padx=5)
+
+        # Right Column
+        right_frame = ttk.Frame(main_frame, style="Section.TFrame", padding="10")
+        right_frame.grid(column=1, row=1, sticky=(tk.N, tk.W, tk.E, tk.S))
+
+        ttk.Label(right_frame, text="Advanced Settings", style="Subtitle.TLabel").grid(column=0, row=0, columnspan=2,
+                                                                                       pady=(0, 10))
 
         # Ammo Regeneration
-        ttk.Label(main_frame, text="Ammo Regeneration:").grid(column=0, row=6, sticky=tk.W, pady=5)
-        ttk.Radiobutton(main_frame, text="No Regeneration", variable=self.ammo_regen,
-                        value="No regen").grid(column=1, row=6, sticky=tk.W)
-        ttk.Radiobutton(main_frame, text="Regeneration", variable=self.ammo_regen,
-                        value="Regen").grid(column=1, row=7, sticky=tk.W)
-        ttk.Button(main_frame, text="Update", command=self.update_ammo_regen).grid(column=2, row=6, padx=5)
+        ttk.Label(right_frame, text="Ammo Regeneration:").grid(column=0, row=1, sticky=tk.W, pady=5)
+        ttk.Radiobutton(right_frame, text="No Regeneration", variable=self.ammo_regen,
+                        value="No regen").grid(column=1, row=1, sticky=tk.W)
+        ttk.Radiobutton(right_frame, text="Regeneration", variable=self.ammo_regen,
+                        value="Regen").grid(column=1, row=2, sticky=tk.W)
+        ttk.Button(right_frame, text="Update", command=self.update_ammo_regen).grid(column=2, row=1, rowspan=2, padx=5)
 
         # Damage Settings
-        ttk.Label(main_frame, text="Damage Settings:").grid(column=0, row=8, sticky=tk.W, pady=5)
-        ttk.Radiobutton(main_frame, text="Modded Damage", variable=self.damage_mode,
-                        value="Mod Damage").grid(column=1, row=8, sticky=tk.W)
-        ttk.Radiobutton(main_frame, text="Vanilla Damage", variable=self.damage_mode,
-                        value="Vanilla Damage").grid(column=1, row=9, sticky=tk.W)
-        ttk.Button(main_frame, text="Update", command=self.update_damage_settings).grid(column=2, row=8, padx=5)
+        ttk.Label(right_frame, text="Damage Settings:").grid(column=0, row=3, sticky=tk.W, pady=5)
+        ttk.Radiobutton(right_frame, text="Modded Damage", variable=self.damage_mode,
+                        value="Mod Damage").grid(column=1, row=3, sticky=tk.W)
+        ttk.Radiobutton(right_frame, text="Vanilla Damage", variable=self.damage_mode,
+                        value="Vanilla Damage").grid(column=1, row=4, sticky=tk.W)
+        ttk.Button(right_frame, text="Update", command=self.update_damage_settings).grid(column=2, row=3, rowspan=2,
+                                                                                         padx=5)
 
         # Buttons for options that still open new windows
-        ttk.Button(main_frame, text="Set War Period", command=self.open_period_window).grid(column=0, row=10,
-                                                                                            sticky=tk.W, pady=10)
-        ttk.Button(main_frame, text="Player Army Size", command=self.player_army_size).grid(column=0, row=11,
-                                                                                            sticky=tk.W, pady=5)
-        ttk.Button(main_frame, text="Preparation Time", command=self.preparation_time).grid(column=0, row=12,
-                                                                                            sticky=tk.W, pady=5)
-        ttk.Button(main_frame, text="Resources at Start", command=self.resources_starting).grid(column=0, row=13,
-                                                                                                sticky=tk.W, pady=5)
-        ttk.Button(main_frame, text="Resource Income", command=self.resource_income).grid(column=0, row=14, sticky=tk.W,
-                                                                                          pady=5)
-        ttk.Button(main_frame, text="AI Defense Research Speed", command=self.ai_fortifications).grid(column=0, row=15,
-                                                                                                      sticky=tk.W,
-                                                                                                      pady=5)
-        ttk.Button(main_frame, text="AI Research Speed", command=self.ai_researches).grid(column=0, row=16, sticky=tk.W,
-                                                                                          pady=5)
+        button_frame = ttk.Frame(main_frame, style="TFrame", padding="10")
+        button_frame.grid(column=0, row=2, columnspan=2, sticky=(tk.W, tk.E), pady=20)
 
-        ttk.Button(main_frame, text="Help", command=self.show_help).grid(column=0, row=17, sticky=tk.W, pady=20)
+        buttons = [
+            ("Set War Period", self.open_period_window),
+            ("Player Army Size", self.player_army_size),
+            ("Preparation Time", self.preparation_time),
+            ("Resources at Start", self.resources_starting),
+            ("Resource Income", self.resource_income),
+            ("AI Defense Research", self.ai_fortifications),
+            ("AI Research Speed", self.ai_researches)
+        ]
+
+        for i, (text, command) in enumerate(buttons):
+            ttk.Button(button_frame, text=text, command=command).grid(column=i % 3, row=i // 3, padx=5, pady=5,
+                                                                      sticky=(tk.W, tk.E))
+
+        button_frame.columnconfigure(0, weight=1)
+        button_frame.columnconfigure(1, weight=1)
+        button_frame.columnconfigure(2, weight=1)
+
+        # Help Button
+        ttk.Button(main_frame, text="Help", command=self.show_help).grid(column=0, row=3, columnspan=2, pady=20)
+
+        # Footer
+        ttk.Label(main_frame, text="Made by MrCookie for Conquest Enhanced mod. Code available on GitHub.",
+                  font=("Helvetica", 8)).grid(column=0, row=4, columnspan=2, pady=10)
 
     def update_ai_army_size(self):
         try:
