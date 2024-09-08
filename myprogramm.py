@@ -276,15 +276,25 @@ class Configurator:
     def backup_files(self):
         backup_dir = self.config['backup_dir']
         os.makedirs(backup_dir, exist_ok=True)
+        file_locations = {}
 
         for file in self.config['files_to_update']:
-            src = os.path.join(self.config['base_dir'], "resource", file)
+            if file in file_locations:
+                src = file_locations[file]
+            else:
+                for root, _, files in os.walk(os.path.join(self.config['base_dir'], "resource")):
+                    if file in files:
+                        src = os.path.join(root, file)
+                        file_locations[file] = src
+                        break
+                else:
+                    logging.warning(f"File not found, skipping backup: {file}")
+                    continue
+
             dst = os.path.join(backup_dir, file)
             os.makedirs(os.path.dirname(dst), exist_ok=True)
             try:
                 shutil.copy2(src, dst)
-            except FileNotFoundError:
-                logging.warning(f"File not found, skipping backup: {src}")
             except PermissionError:
                 raise Exception(f"Permission denied when trying to backup {src}")
 
@@ -297,14 +307,26 @@ class Configurator:
         status_label.pack()
 
         total_files = len(self.config['files_to_update'])
+        file_locations = {}
+
         for i, file in enumerate(self.config['files_to_update']):
-            src = os.path.join(self.config['base_dir'], "configurator files", f"{period}war", file)
+            if file in file_locations:
+                src = file_locations[file]
+            else:
+                for root, _, files in os.walk(
+                        os.path.join(self.config['base_dir'], "configurator files", f"{period}war")):
+                    if file in files:
+                        src = os.path.join(root, file)
+                        file_locations[file] = src
+                        break
+                else:
+                    logging.warning(f"File not found, skipping update: {file}")
+                    continue
+
             dst = os.path.join(self.config['base_dir'], "resource", file)
             try:
                 with open(src, "r") as source_file, open(dst, "w") as dest_file:
                     dest_file.write(source_file.read())
-            except FileNotFoundError:
-                logging.warning(f"File not found, skipping update: {src}")
             except PermissionError:
                 raise Exception(f"Permission denied when trying to update {dst}")
 
